@@ -1,31 +1,62 @@
-import { featureFlagPrefix } from "@azure/app-configuration";
-import type { AzureAppConfiguration } from "@azure/app-configuration-provider";
-import type { TokenCredential } from "@azure/core-auth";
-import { load } from "@azure/app-configuration-provider";
-import type { FeatureFlagsRecord } from "./types.ts";
+import {
+  AppConfigurationClient,
+  featureFlagPrefix,
+  parseFeatureFlag,
+} from "@azure/app-configuration";
+import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
 
 export async function fetchFeatureFlags(
-  endpoint: URL | string,
-  credential: TokenCredential
-): Promise<FeatureFlagsRecord>;
-export async function fetchFeatureFlags(
-  connectionString: string
-): Promise<FeatureFlagsRecord>;
-export async function fetchFeatureFlags(
-  param1: string | URL,
-  param2?: TokenCredential
-) {
-  const options: Parameters<typeof load>["2"] = {
-    selectors: [{ keyFilter: `${featureFlagPrefix}*` }],
-    trimKeyPrefixes: [featureFlagPrefix],
-  };
-
-  let config: AzureAppConfiguration;
-  if (!param2) {
-    config = await load(param1.toString(), options);
-  } else {
-    config = await load(param1, param2, options);
+  client: AppConfigurationClient
+): Promise<FeatureFlagsRecord> {
+  if (!(client instanceof AppConfigurationClient)) {
+    throw new Error("'client' is not valid Azure AppConfigurationClient");
   }
 
-  return Object.fromEntries(config.entries());
+  const iterator = client.listConfigurationSettings({
+    keyFilter: `${featureFlagPrefix}*`,
+  });
+
+  const record: FeatureFlagsRecord = {};
+
+  let done = false;
+  while (!done) {
+    const entry = await iterator.next();
+    if (entry.done) {
+      done = true;
+      break;
+    }
+    try {
+      const featureFlag = parseFeatureFlag(entry.value).value as FeatureFlag;
+      record[featureFlag.id] = featureFlag;
+    } catch {}
+  }
+
+  return record;
+}
+
+export async function fetchFeatureFlagByKey(
+  client: AppConfigurationClient,
+  key: string
+): Promise<FeatureFlag | null> {
+  if (!(client instanceof AppConfigurationClient)) {
+    throw new Error("'client' is not valid Azure AppConfigurationClient");
+  }
+  if (!key) {
+    throw new Error("Feature flag 'key' is missing");
+  }
+  if (!key.startsWith(featureFlagPrefix)) {
+    key = `${featureFlagPrefix}${key}`;
+  }
+
+  try {
+    const response = await client.getConfigurationSetting({ key });
+    if (response && typeof response === "object" && response.value) {
+      return JSON.parse(response.value);
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching feature flag:", error);
+    return null;
+  }
 }

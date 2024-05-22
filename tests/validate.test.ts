@@ -1,5 +1,9 @@
 import { vi, describe, it, expect } from "vitest";
-import type { FeatureFlag, FeatureFlagCustomFilter } from "../src/types";
+import type {
+  FeatureFlag,
+  FeatureFlagClientFilter,
+  FeatureFlagCustomFilter,
+} from "../src/types";
 import { validateFeatureFlag } from "../src/validate";
 
 vi.useFakeTimers();
@@ -35,9 +39,7 @@ describe("validateFeatureFlag", () => {
     const featureFlag: FeatureFlag = {
       id: "feature",
       enabled: true,
-      conditions: {
-        client_filters: [customFilter] as FeatureFlagCustomFilter[],
-      },
+      conditions: { client_filters: [customFilter] },
     };
 
     expect(() => validateFeatureFlag(featureFlag)).toThrowError(
@@ -50,7 +52,7 @@ describe("validateFeatureFlag", () => {
       id: "feature",
       enabled: true,
       conditions: {
-        client_filters: [
+        clientFilters: [
           {
             name: "Microsoft.Targeting",
             parameters: {
@@ -153,6 +155,35 @@ describe("validateFeatureFlag", () => {
       vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
       expect(validateFeatureFlag(featureFlag)).toBe(true);
     });
+
+    it("should throw error if both Start and End are missing (treat as custom filter)", () => {
+      const filter: FeatureFlagClientFilter = {
+        name: "Microsoft.TimeWindow",
+        parameters: {},
+      };
+      const customFlag: FeatureFlag = {
+        ...featureFlag,
+        conditions: { client_filters: [filter] },
+      };
+      expect(() => validateFeatureFlag(customFlag)).toThrowError(
+        `Custom validator is not implemented for: ${JSON.stringify(filter)}`
+      );
+    });
+
+    it("should throw error if Start or End are not string", () => {
+      const filter: FeatureFlagClientFilter = {
+        name: "Microsoft.TimeWindow",
+        // @ts-expect-error
+        parameters: { End: { foo: "bar" } },
+      };
+      const customFlag: FeatureFlag = {
+        ...featureFlag,
+        conditions: { client_filters: [filter] },
+      };
+      expect(() => validateFeatureFlag(customFlag)).toThrowError(
+        `Custom validator is not implemented for: ${JSON.stringify(filter)}`
+      );
+    });
   });
 
   describe("Custom filter", () => {
@@ -160,9 +191,7 @@ describe("validateFeatureFlag", () => {
     const featureFlag: FeatureFlag = {
       id: "feature",
       enabled: true,
-      conditions: {
-        client_filters: [customFilter] as FeatureFlagCustomFilter[],
-      },
+      conditions: { client_filters: [customFilter] },
     };
 
     it("should return false when custom filter does not validate", () => {

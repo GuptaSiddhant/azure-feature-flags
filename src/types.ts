@@ -2,18 +2,20 @@ export type FeatureFlagsRecord = Record<string, FeatureFlag>;
 
 export type FeatureFlag = {
   conditions: {
-    client_filters: Array<
-      | FeatureFlagTargetingFilter
-      | FeatureFlagTimeWindowFilter
-      | FeatureFlagCustomFilter
-    >;
-    requirement_type?: "All";
+    clientFilters?: Array<FeatureFlagClientFilter>;
+    client_filters?: Array<FeatureFlagClientFilter>;
+    requirement_type?: "All" | "Any";
   };
   description?: string;
   displayName?: string;
   enabled: boolean;
   id: string;
 };
+
+export type FeatureFlagClientFilter =
+  | FeatureFlagTargetingFilter
+  | FeatureFlagTimeWindowFilter
+  | FeatureFlagCustomFilter;
 
 export type FeatureFlagTargetingFilter = {
   name: "Microsoft.Targeting";
@@ -29,14 +31,14 @@ export type FeatureFlagTargetingFilter = {
 
 export type FeatureFlagTimeWindowFilter = {
   name: "Microsoft.TimeWindow";
-  parameters: {
-    End?: string | null;
-    Start?: string | null;
-  };
+  parameters:
+    | { End: string; Start?: string | null }
+    | { End?: string | null; Start: string | null }
+    | { End: string; Start: string };
 };
 
 export type FeatureFlagCustomFilter = {
-  name: "Custom";
+  name: string;
   parameters: Record<string, string>;
 };
 

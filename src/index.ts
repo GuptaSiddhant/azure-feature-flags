@@ -1,4 +1,4 @@
-export { fetchFeatureFlags } from "./service.js";
+export { fetchFeatureFlags, fetchFeatureFlagByKey } from "./service.js";
 export { validateFeatureFlag } from "./validate.js";
 
 export type {
@@ -9,4 +9,6 @@ export type {
   CustomFilters,
   CustomFilterValidator,
   ValidateFeatureFlagOptions,
-} from "./types.ts";
+  FeatureFlagClientFilter,
+  FeatureFlagCustomFilter,
+} from "./types.js";

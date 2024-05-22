@@ -1,9 +1,10 @@
 import type {
   FeatureFlag,
+  FeatureFlagClientFilter,
   FeatureFlagTargetingFilter,
   FeatureFlagTimeWindowFilter,
   ValidateFeatureFlagOptions,
-} from "./types.ts";
+} from "./types.js";
 
 /**
  * Validate the feature-flag object with filters and rollout.
@@ -20,14 +21,16 @@ export function validateFeatureFlag(
     return false;
   }
 
-  const filters = featureFlag.conditions.client_filters;
+  const filters =
+    featureFlag.conditions.client_filters ||
+    featureFlag.conditions.clientFilters;
   if (!filters || filters.length === 0) {
     return featureFlag.enabled;
   }
 
   let validFilters = 0;
   filterLoop: for (const filter of filters) {
-    if (filter.name === "Microsoft.TimeWindow") {
+    if (isTimeWindowClientFilter(filter)) {
       if (validateFeatureFlagTimeWindowFilter(filter)) {
         validFilters += 1;
       }
@@ -38,7 +41,7 @@ export function validateFeatureFlag(
       options.groups?.filter((g): g is string => g !== undefined) ?? [];
     const users = options.user ? [options.user] : [];
 
-    if (filter.name === "Microsoft.Targeting") {
+    if (checkIsTargetingClientFilter(filter)) {
       if (validateFeatureFlagTargetingFilter(filter, groups, users)) {
         validFilters += 1;
       }
@@ -150,4 +153,35 @@ function checkTargetingFilterInput(
     return false;
   }
   return audiences.some((audience) => inputs.includes(audience));
+}
+
+function checkIsTargetingClientFilter(
+  filter: FeatureFlagClientFilter
+): filter is FeatureFlagTargetingFilter {
+  const Audience =
+    filter?.name == "Microsoft.Targeting" &&
+    filter.parameters &&
+    filter.parameters["Audience"];
+
+  return typeof Audience === "object";
+}
+
+function isTimeWindowClientFilter(
+  filter: FeatureFlagClientFilter
+): filter is FeatureFlagTimeWindowFilter {
+  const parameters =
+    filter?.name === "Microsoft.TimeWindow" && filter.parameters;
+  if (typeof parameters !== "object") return false;
+
+  const { Start, End } = parameters;
+  if (!Start && !End) return false;
+
+  if (
+    (Start && typeof Start === "string") ||
+    (End && typeof End === "string")
+  ) {
+    return true;
+  }
+
+  return false;
 }

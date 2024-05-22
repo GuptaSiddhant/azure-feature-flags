@@ -2,36 +2,47 @@
 
 Fetch and validate feature flags from Azure Configuration.
 
+This package depends on `@azure/app-configuration` to generate the `AppConfigurationClient`.
+
 > Note: This library does not manage rollout functionality yet. Thus, currently any rollout set to `> 0` will validate to `true`.
 
 ## Usage
 
 ### `fn`: `fetchFeatureFlags`
 
-#### - With Azure `CONNECTION_STRING` or `ACCESS_STRING`
+Fetch all feature flags from Azure App Config and return them as a record.
 
 ```ts
+import { AppConfigurationClient } from "@azure/app-configuration";
 import { fetchFeatureFlags } from "azure-feature-flags";
 
 const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
+const client = new AppConfigurationClient(connectionString);
 
-const featureFlags = await fetchFeatureFlags(connectionString);
-//    ^ All feature flags
+const featureFlags: FeatureFlagsRecord = await fetchFeatureFlags(client);
 ```
 
-#### - With Azure `Endpoint` and `Credential`
+### `fn`: `fetchFeatureFlagByKey`
+
+Fetch feature flag data for specific key.
 
 ```ts
+import { AppConfigurationClient } from "@azure/app-configuration";
 import { fetchFeatureFlags } from "azure-feature-flags";
 
-const endpoint = process.env.AZURE_CONFIG_ENDPOINT;
-const credential = new DefaultAzureCredential(); // or other method to generate Azure `TokenCredential`.
+const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
+const client = new AppConfigurationClient(connectionString);
+const featureFlagKey = "your-feature-flag-key";
 
-const featureFlags = await fetchFeatureFlags(endpoint, credential);
-//    ^ All feature flags
+const featureFlag: FeatureFlag | null = await fetchFeatureFlagByKey(
+  client,
+  featureFlagKey
+);
 ```
 
 ### `fn`: `validateFeatureFlag`
+
+Validate a feature-flag object against filters/conditions.
 
 #### - Default and TimeWindow filter
 
@@ -40,11 +51,7 @@ If filters are not set on the flag, the validation returns the value set in `fea
 ```ts
 import { validateFeatureFlag } from "azure-feature-flags";
 
-const featureFlagKey = "your-feature-flag-id";
-const featureFlag = featureFlags[featureFlagKey];
-
-const isValid = validateFeatureFlag(featureFlag);
-//    ^ boolean
+const isValid: boolean = validateFeatureFlag(featureFlag);
 ```
 
 #### - Targeting Audience filter With Groups/User
@@ -54,10 +61,7 @@ When a group(s) or user is provided, the value is matched against the targeted a
 ```ts
 import { validateFeatureFlag } from "azure-feature-flags";
 
-const featureFlagKey = "your-feature-flag-id";
-const featureFlag = featureFlags[featureFlagKey];
-
-const isValid = validateFeatureFlag(featureFlag, {
+const isValid: boolean = validateFeatureFlag(featureFlag, {
   groups: ["editor"],
   user: "user-id",
 });
@@ -73,14 +77,11 @@ The validator function received the `parameters` object set in Azure Config as f
 import { validateFeatureFlag } from "azure-feature-flags";
 import type { CustomFilterValidator } from "azure-feature-flags";
 
-const featureFlagKey = "your-feature-flag-id";
-const featureFlag = featureFlags[featureFlagKey];
-
 const myFilterValidator: CustomFilterValidator = (parameters) => {
   return parameters["foo"] === "bar";
 };
 
-const isValid = validateFeatureFlag(featureFlag, {
+const isValid: boolean = validateFeatureFlag(featureFlag, {
   customFilters: {
     "my-filter-name": myFilterValidator,
   },
