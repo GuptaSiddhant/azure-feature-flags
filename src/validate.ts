@@ -10,7 +10,7 @@ import type {
  *
  * @param featureFlag Azure Feature Flag config object
  * @param options
- * @returns if the feature flag should be enabled of not with given filters
+ * @returns if the feature flag should be enabled or not with given filters
  */
 export function validateFeatureFlag(
   featureFlag: FeatureFlag | null | undefined,

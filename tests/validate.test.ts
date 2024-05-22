@@ -1,9 +1,8 @@
 import { vi, describe, it, expect } from "vitest";
-import type { FeatureFlag } from "../src/types";
+import type { FeatureFlag, FeatureFlagCustomFilter } from "../src/types";
 import { validateFeatureFlag } from "../src/validate";
 
 vi.useFakeTimers();
-const spyConsoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
 // write jest test for validateFeatureFlag
 describe("validateFeatureFlag", () => {
@@ -31,22 +30,18 @@ describe("validateFeatureFlag", () => {
     expect(validateFeatureFlag(featureFlag)).toBe(true);
   });
 
-  it("should do nothing if a custom/unsupported filter is found", () => {
-    const customFilter = { name: "CustomFilter", parameters: {} };
+  it("throw error if a custom/unsupported filter is found", () => {
+    const customFilter = { name: "my-filter", parameters: { foo: "bar" } };
     const featureFlag: FeatureFlag = {
       id: "feature",
       enabled: true,
       conditions: {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        client_filters: [customFilter],
+        client_filters: [customFilter] as FeatureFlagCustomFilter[],
       },
     };
 
-    validateFeatureFlag(featureFlag);
-    expect(spyConsoleError).toHaveBeenCalledWith(
-      "Custom filters are not supported yet.",
-      customFilter
+    expect(() => validateFeatureFlag(featureFlag)).toThrowError(
+      `Custom validator is not implemented for: ${JSON.stringify(customFilter)}`
     );
   });
 
@@ -157,6 +152,33 @@ describe("validateFeatureFlag", () => {
     it("should return true between Start and End date", () => {
       vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
       expect(validateFeatureFlag(featureFlag)).toBe(true);
+    });
+  });
+
+  describe("Custom filter", () => {
+    const customFilter = { name: "my-filter", parameters: { foo: "bar" } };
+    const featureFlag: FeatureFlag = {
+      id: "feature",
+      enabled: true,
+      conditions: {
+        client_filters: [customFilter] as FeatureFlagCustomFilter[],
+      },
+    };
+
+    it("should return false when custom filter does not validate", () => {
+      expect(
+        validateFeatureFlag(featureFlag, {
+          customFilters: { "my-filter": (params) => params["foo"] === "abc" },
+        })
+      ).toBe(false);
+    });
+
+    it("should return true when custom filter does correctly validate", () => {
+      expect(
+        validateFeatureFlag(featureFlag, {
+          customFilters: { "my-filter": (params) => params["foo"] === "bar" },
+        })
+      ).toBe(true);
     });
   });
 

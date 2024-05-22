@@ -19,7 +19,7 @@ const featureFlags = await fetchFeatureFlags(connectionString);
 //    ^ All feature flags
 ```
 
-#### - With Azure `Endpoint` or `Credential`
+#### - With Azure `Endpoint` and `Credential`
 
 ```ts
 import { fetchFeatureFlags } from "azure-feature-flags";
