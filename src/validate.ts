@@ -2,13 +2,16 @@ import type {
   FeatureFlag,
   FeatureFlagTargetingFilter,
   FeatureFlagTimeWindowFilter,
+  ValidateFeatureFlagOptions,
 } from "./types.ts";
 
-export type ValidateFeatureFlagOptions = {
-  groups?: Array<string | undefined>;
-  user?: string;
-};
-
+/**
+ * Validate the feature-flag object with filters and rollout.
+ *
+ * @param featureFlag Azure Feature Flag config object
+ * @param options
+ * @returns if the feature flag should be enabled of not with given filters
+ */
 export function validateFeatureFlag(
   featureFlag: FeatureFlag | null | undefined,
   options: ValidateFeatureFlagOptions = {}
@@ -23,30 +26,41 @@ export function validateFeatureFlag(
   }
 
   let validFilters = 0;
-  for (const filter of filters) {
-    switch (filter.name) {
-      case "Microsoft.TimeWindow": {
-        if (validateFeatureFlagTimeWindowFilter(filter)) {
+  filterLoop: for (const filter of filters) {
+    if (filter.name === "Microsoft.TimeWindow") {
+      if (validateFeatureFlagTimeWindowFilter(filter)) {
+        validFilters += 1;
+      }
+      continue;
+    }
+
+    const groups =
+      options.groups?.filter((g): g is string => g !== undefined) ?? [];
+    const users = options.user ? [options.user] : [];
+
+    if (filter.name === "Microsoft.Targeting") {
+      if (validateFeatureFlagTargetingFilter(filter, groups, users)) {
+        validFilters += 1;
+      }
+      continue;
+    }
+
+    // Custom filters
+    for (const [name, validator] of Object.entries(
+      options.customFilters ?? {}
+    )) {
+      if (filter.name === name) {
+        if (validator(filter.parameters, groups, users)) {
           validFilters += 1;
         }
-        break;
-      }
 
-      case "Microsoft.Targeting": {
-        const groups =
-          options.groups?.filter((g): g is string => g !== undefined) ?? [];
-        const users = options.user ? [options.user] : [];
-        if (validateFeatureFlagTargetingFilter(filter, groups, users)) {
-          validFilters += 1;
-        }
-        break;
-      }
-
-      default: {
-        console.error("Custom filters are not supported yet.", filter);
-        break;
+        continue filterLoop;
       }
     }
+
+    throw new Error(
+      "Custom validator is not implemented for: " + JSON.stringify(filter)
+    );
   }
 
   const requireAllFilters = featureFlag.conditions.requirement_type === "All";
