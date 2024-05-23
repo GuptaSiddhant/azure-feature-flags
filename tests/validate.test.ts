@@ -43,7 +43,7 @@ describe("validateFeatureFlag", () => {
     };
 
     expect(() => validateFeatureFlag(featureFlag)).toThrowError(
-      `Custom validator is not implemented for: ${JSON.stringify(customFilter)}`
+      `Custom filter validator is not implemented for: '${customFilter.name}'`
     );
   });
 
@@ -166,7 +166,7 @@ describe("validateFeatureFlag", () => {
         conditions: { client_filters: [filter] },
       };
       expect(() => validateFeatureFlag(customFlag)).toThrowError(
-        `Custom validator is not implemented for: ${JSON.stringify(filter)}`
+        `Custom filter validator is not implemented for: '${filter.name}'`
       );
     });
 
@@ -181,7 +181,7 @@ describe("validateFeatureFlag", () => {
         conditions: { client_filters: [filter] },
       };
       expect(() => validateFeatureFlag(customFlag)).toThrowError(
-        `Custom validator is not implemented for: ${JSON.stringify(filter)}`
+        `Custom filter validator is not implemented for: '${filter.name}'`
       );
     });
   });
@@ -197,7 +197,9 @@ describe("validateFeatureFlag", () => {
     it("should return false when custom filter does not validate", () => {
       expect(
         validateFeatureFlag(featureFlag, {
-          customFilters: { "my-filter": (params) => params["foo"] === "abc" },
+          customFilterValidators: {
+            "my-filter": (filter) => filter.parameters["foo"] === "abc",
+          },
         })
       ).toBe(false);
     });
@@ -205,7 +207,9 @@ describe("validateFeatureFlag", () => {
     it("should return true when custom filter does correctly validate", () => {
       expect(
         validateFeatureFlag(featureFlag, {
-          customFilters: { "my-filter": (params) => params["foo"] === "bar" },
+          customFilterValidators: {
+            "my-filter": (filter) => filter.parameters["foo"] === "bar",
+          },
         })
       ).toBe(true);
     });

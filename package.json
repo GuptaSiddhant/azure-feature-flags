@@ -42,10 +42,10 @@
     }
   },
   "scripts": {
-    "build": "yarn build:cjs; yarn build:esm;",
+    "build": "yarn build:cjs && yarn build:esm",
     "build:cjs": "rm -rf cjs; tsc -p tsconfig.cjs.json",
     "build:esm": "rm -rf esm; tsc",
-    "prepublishOnly": "yarn build; yarn test",
+    "prepublishOnly": " yarn test && yarn build",
     "test": "vitest run --coverage",
     "test:watch": "vitest --coverage"
   },
