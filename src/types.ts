@@ -42,21 +42,26 @@ export type FeatureFlagCustomFilter = {
   parameters: Record<string, string>;
 };
 
-export type CustomFilterValidator = (
-  parameters: FeatureFlagCustomFilter["parameters"],
-  groups: Array<string>,
-  users: Array<string>
+export type FeatureFlagCustomFilterValidator = (
+  filter: FeatureFlagCustomFilter,
+  options: FeatureFlagCustomFilterValidatorOptions
 ) => boolean;
 
-export interface CustomFilters {
-  [name: string]: CustomFilterValidator;
-}
+export type FeatureFlagCustomFilterValidatorOptions = {
+  groups: Array<string>;
+  users: Array<string>;
+};
 
-export type ValidateFeatureFlagOptions = {
+export type FeatureFlagCustomFilterValidators = Record<
+  string,
+  FeatureFlagCustomFilterValidator
+>;
+
+export type FeatureFlagValidateOptions = {
   /** Groups to validate the feature flag against */
   groups?: Array<string | undefined>;
   /** User ID to validate the feature flag against */
   user?: string;
-  /** Handle custom filters */
-  customFilters?: CustomFilters;
+  /** Handle and validate custom filters */
+  customFilterValidators?: FeatureFlagCustomFilterValidators;
 };

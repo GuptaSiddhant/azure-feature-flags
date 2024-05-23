@@ -3,12 +3,9 @@ export { validateFeatureFlag } from "./validate.js";
 
 export type {
   FeatureFlag,
-  FeatureFlagTargetingFilter,
-  FeatureFlagTimeWindowFilter,
   FeatureFlagsRecord,
-  CustomFilters,
-  CustomFilterValidator,
-  ValidateFeatureFlagOptions,
-  FeatureFlagClientFilter,
   FeatureFlagCustomFilter,
+  FeatureFlagCustomFilterValidator,
+  FeatureFlagCustomFilterValidators,
+  FeatureFlagValidateOptions,
 } from "./types.js";
