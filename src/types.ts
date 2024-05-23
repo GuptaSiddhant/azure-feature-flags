@@ -32,8 +32,8 @@ export type FeatureFlagTargetingFilter = {
 export type FeatureFlagTimeWindowFilter = {
   name: "Microsoft.TimeWindow";
   parameters:
-    | { End: string; Start?: string | null }
-    | { End?: string | null; Start: string | null }
+    | { End: string; Start: null }
+    | { End: null; Start: string }
     | { End: string; Start: string };
 };
 
@@ -49,6 +49,7 @@ export type FeatureFlagCustomFilterValidator = (
 
 export type FeatureFlagCustomFilterValidatorOptions = {
   groups: Array<string>;
+  key: string;
   users: Array<string>;
 };
 
@@ -64,4 +65,15 @@ export type FeatureFlagValidateOptions = {
   users?: Array<string>;
   /** Handle and validate custom filters */
   customFilterValidators?: FeatureFlagCustomFilterValidators;
+  /**
+   * Function to handle partial rollout.
+   * By default, it only checks if rolloutPercentage > 0.
+   */
+  handleRollout?: FeatureFlagHandleRollout;
 };
+
+export type FeatureFlagHandleRollout = (
+  flagKey: string,
+  rolloutPercentage: number,
+  groupName: string | undefined
+) => boolean;

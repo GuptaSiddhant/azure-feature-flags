@@ -46,11 +46,18 @@ export function validateFeatureFlag(
 
     const filterOptions: FeatureFlagCustomFilterValidatorOptions = {
       groups: options.groups ?? [],
+      key: featureFlag.id,
       users: options.users ?? [],
     };
 
     if (checkIsTargetingClientFilter(filter)) {
-      if (validateFeatureFlagTargetingFilter(filter, filterOptions)) {
+      if (
+        validateFeatureFlagTargetingFilter(
+          filter,
+          filterOptions,
+          options.handleRollout
+        )
+      ) {
         validFilters += 1;
       }
       continue;

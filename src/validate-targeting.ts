@@ -2,6 +2,7 @@ import type {
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlagClientFilter,
   FeatureFlagTargetingFilter,
+  FeatureFlagHandleRollout,
 } from "./types.js";
 
 export function checkIsTargetingClientFilter(
@@ -15,9 +16,14 @@ export function checkIsTargetingClientFilter(
   return typeof Audience === "object";
 }
 
+const defaultHandleRollout: FeatureFlagHandleRollout = (_, percentage) => {
+  return percentage > 0;
+};
+
 export function validateFeatureFlagTargetingFilter(
   filter: FeatureFlagTargetingFilter,
-  options: FeatureFlagCustomFilterValidatorOptions
+  options: FeatureFlagCustomFilterValidatorOptions,
+  handleRollout: FeatureFlagHandleRollout = defaultHandleRollout
 ): boolean {
   // The options is currently tested against both included and excluded audiences.
   // In future, more options can be added which are tested against either audiences.
@@ -44,13 +50,13 @@ export function validateFeatureFlagTargetingFilter(
   if (groups.length > 0 && Groups && Groups.length > 0) {
     for (const Group of Groups) {
       if (groups.includes(Group.Name)) {
-        return Group.RolloutPercentage > 0;
+        return handleRollout(options.key, Group.RolloutPercentage, Group.Name);
       }
     }
     return false;
   }
   // 5 If default rollout is valid, return true (partial rollout not implemented).
-  return DefaultRolloutPercentage > 0;
+  return handleRollout(options.key, DefaultRolloutPercentage, undefined);
 }
 
 function checkTargetingFilterInput(

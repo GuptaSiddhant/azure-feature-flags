@@ -4,8 +4,6 @@
 
 This package depends on `@azure/app-configuration` to generate the Azure `AppConfigurationClient`.
 
-> Note: This package does not manage rollout functionality yet. Thus, currently any rollout set to `> 0` will be truthy.
-
 ## Install
 
 ```sh
@@ -60,7 +58,7 @@ Validate a feature-flag object against filters/conditions.
 
 > Note: The function will `throw` if a custom filter is encountered without a validator. Hence, it is recommended to wrap the function call in try-catch for handling unsupported custom filters.
 
-#### - Default and TimeWindow filter
+#### Default and TimeWindow filter
 
 If filters are not set on the flag, the validation returns the value set in `featureFlag.enabled`. Otherwise, the `TimeWindow` filter is also tested against current time.
 
@@ -70,9 +68,11 @@ import { validateFeatureFlag } from "azure-feature-flags";
 const isValid: boolean = validateFeatureFlag(featureFlag);
 ```
 
-#### - Targeting Audience filter With Groups/User
+#### Targeting Audience filter With Groups/User
 
-When a group(s) or user is provided, the value is matched against the targeted audiences (both included and excluded) set in the Azure App Config.
+When a group(s) or user(s) are provided, the value is matched against the targeted audiences (both included and excluded) set in the Azure App Config.
+
+> Note: This package does not manage rollout functionality by itself. By default, any rollout percentage set to `> 0` is considered valid. This behaviour can be overridden by providing a custom `handleRollout` callback in the options.
 
 ```ts
 import { validateFeatureFlag } from "azure-feature-flags";
@@ -83,7 +83,28 @@ const isValid: boolean = validateFeatureFlag(featureFlag, {
 });
 ```
 
-#### - With custom filters
+##### Handle rollout
+
+```ts
+import { validateFeatureFlag } from "azure-feature-flags";
+import type { FeatureFlagHandleRollout } from "azure-feature-flags";
+
+const handleRollout: FeatureFlagHandleRollout = (
+  flagKey,
+  rolloutPercentage,
+  groupName // groupName is `undefined` for `DefaultRolloutPercentage`.
+) => {
+  // logic to determine if the feature flag should be enabled or not.
+  return groupName === "editor" && rolloutPercentage > Math.random() * 100;
+};
+
+const isValid: boolean = validateFeatureFlag(featureFlag, {
+  groups: ["editor"],
+  handleRollout,
+});
+```
+
+#### With custom filters
 
 Azure allows for custom filters and they need to be manually tested against. The function accepts an object of custom filters to test against.
 
@@ -97,6 +118,7 @@ const myFilterValidator: FeatureFlagCustomFilterValidator = (
   filter,
   options
 ) => {
+  // logic to determine if the feature flag should be enabled or not.
   return (
     filter.parameters["foo"] === "bar" && filter.parameters["abc"] !== "def"
   );

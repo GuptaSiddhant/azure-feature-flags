@@ -28,11 +28,12 @@ export function validateFeatureFlagTimeWindowFilter(
 ): boolean {
   const { End, Start } = filter.parameters;
   const now = Date.now();
-  if (Start && new Date(Start).valueOf() > now) {
+  if (
+    (End && new Date(End).valueOf() < now) ||
+    (Start && new Date(Start).valueOf() > now)
+  ) {
     return false;
   }
-  if (End && now > new Date(End).valueOf()) {
-    return false;
-  }
+
   return true;
 }
