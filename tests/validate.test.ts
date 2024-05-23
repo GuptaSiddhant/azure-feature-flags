@@ -1,14 +1,9 @@
 import { vi, describe, it, expect } from "vitest";
-import type {
-  FeatureFlag,
-  FeatureFlagClientFilter,
-  FeatureFlagCustomFilter,
-} from "../src/types";
+import type { FeatureFlag, FeatureFlagClientFilter } from "../src/types";
 import { validateFeatureFlag } from "../src/validate";
 
 vi.useFakeTimers();
 
-// write jest test for validateFeatureFlag
 describe("validateFeatureFlag", () => {
   it("should return false for invalid feature flag", () => {
     expect(validateFeatureFlag(undefined)).toBe(false);
@@ -58,13 +53,13 @@ describe("validateFeatureFlag", () => {
             parameters: {
               Audience: {
                 Exclusion: {
-                  Groups: ["de-de", "fr-fr", "desktop"],
+                  Groups: ["de-de", "fr-fr"],
                   Users: ["test-user-3", "test-user-4"],
                 },
                 Groups: [
-                  { Name: "en-au", RolloutPercentage: 100 },
-                  { Name: "en-eu", RolloutPercentage: 100 },
-                  { Name: "mobile", RolloutPercentage: 100 },
+                  { Name: "sv-se", RolloutPercentage: 50 },
+                  { Name: "en-gb", RolloutPercentage: 100 },
+                  { Name: "fi-fi", RolloutPercentage: 0 },
                 ],
                 Users: ["test-user-1", "test-user-2"],
                 DefaultRolloutPercentage: 50,
@@ -82,7 +77,7 @@ describe("validateFeatureFlag", () => {
       );
     });
     it("should return true where included locale group is matching", () => {
-      expect(validateFeatureFlag(featureFlag, { groups: ["en-au"] })).toBe(
+      expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).toBe(
         true
       );
     });
@@ -91,31 +86,25 @@ describe("validateFeatureFlag", () => {
         false
       );
     });
-
-    it("should return true where isMobile group is matching", () => {
-      expect(validateFeatureFlag(featureFlag, { groups: ["mobile"] })).toBe(
-        true
-      );
-    });
-    it("should return true where isMobile group is excluded", () => {
-      expect(validateFeatureFlag(featureFlag, { groups: ["desktop"] })).toBe(
+    it("should return false where included locale group is matching with RolloutPercentage=0", () => {
+      expect(validateFeatureFlag(featureFlag, { groups: ["fi-fi"] })).toBe(
         false
       );
     });
 
     // Users
     it("should return false where included user is missing", () => {
-      expect(validateFeatureFlag(featureFlag, { user: "test-user-5" })).toBe(
+      expect(validateFeatureFlag(featureFlag, { users: ["test-user-5"] })).toBe(
         false
       );
     });
     it("should return true where included user is matching", () => {
-      expect(validateFeatureFlag(featureFlag, { user: "test-user-1" })).toBe(
+      expect(validateFeatureFlag(featureFlag, { users: ["test-user-1"] })).toBe(
         true
       );
     });
     it("should return false where excluded user is matching", () => {
-      expect(validateFeatureFlag(featureFlag, { user: "test-user-3" })).toBe(
+      expect(validateFeatureFlag(featureFlag, { users: ["test-user-3"] })).toBe(
         false
       );
     });
@@ -123,6 +112,14 @@ describe("validateFeatureFlag", () => {
     // Default
     it("should return true if no options are provided and DefaultRollout > 0", () => {
       expect(validateFeatureFlag(featureFlag, {})).toBe(true);
+    });
+
+    // This test should be at the end of block because it modifies the feature flag object
+    it("should return false if no options are provided and DefaultRollout = 0", () => {
+      featureFlag.conditions.clientFilters![0].parameters[
+        "Audience"
+      ].DefaultRolloutPercentage = 0;
+      expect(validateFeatureFlag(featureFlag, {})).toBe(false);
     });
   });
 
@@ -225,7 +222,7 @@ describe("validateFeatureFlag", () => {
             name: "Microsoft.Targeting",
             parameters: {
               Audience: {
-                Groups: [{ Name: "en-au", RolloutPercentage: 100 }],
+                Groups: [{ Name: "en-gb", RolloutPercentage: 100 }],
                 DefaultRolloutPercentage: 50,
               },
             },
@@ -241,9 +238,9 @@ describe("validateFeatureFlag", () => {
       },
     };
 
-    it("should return true if any filter is valid (OR)", () => {
+    it("should return true if any filter is valid", () => {
       vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-      expect(validateFeatureFlag(featureFlag, { groups: ["en-au"] })).toBe(
+      expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).toBe(
         true
       );
 
@@ -252,13 +249,14 @@ describe("validateFeatureFlag", () => {
         true
       );
     });
-    it("should return false if all filters are invalid (OR)", () => {
+    it("should return false if all filters are invalid", () => {
       vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
       expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).toBe(
         false
       );
     });
   });
+
   describe("Multiple filters (AND)", () => {
     const featureFlag: FeatureFlag = {
       id: "feature",
@@ -270,7 +268,7 @@ describe("validateFeatureFlag", () => {
             name: "Microsoft.Targeting",
             parameters: {
               Audience: {
-                Groups: [{ Name: "en-au", RolloutPercentage: 100 }],
+                Groups: [{ Name: "en-gb", RolloutPercentage: 100 }],
                 DefaultRolloutPercentage: 50,
               },
             },
@@ -286,15 +284,15 @@ describe("validateFeatureFlag", () => {
       },
     };
 
-    it("should return true if all filters are valid (AND)", () => {
+    it("should return true if all filters are valid", () => {
       vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-      expect(validateFeatureFlag(featureFlag, { groups: ["en-au"] })).toBe(
+      expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).toBe(
         true
       );
     });
-    it("should return false if any filter is invalid (AND)", () => {
+    it("should return false if any filter is invalid", () => {
       vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-      expect(validateFeatureFlag(featureFlag, { groups: ["en-au"] })).toBe(
+      expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).toBe(
         false
       );
 

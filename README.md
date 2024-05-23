@@ -79,7 +79,7 @@ import { validateFeatureFlag } from "azure-feature-flags";
 
 const isValid: boolean = validateFeatureFlag(featureFlag, {
   groups: ["editor"],
-  user: "user-id",
+  users: ["user-id"],
 });
 ```
 

@@ -3,7 +3,7 @@ import { AppConfigurationClient } from "@azure/app-configuration";
 import { fetchFeatureFlags, fetchFeatureFlagByKey } from "../src/service";
 
 describe.skip("fetchFeatureFlags", () => {
-  it("should fetch", async () => {
+  it("should fetch all flags", async () => {
     const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
     if (!connectionString)
       throw new Error("AZURE_CONFIG_ACCESS_STRING env missing");
@@ -17,16 +17,14 @@ describe.skip("fetchFeatureFlags", () => {
 });
 
 describe.skip("fetchFeatureFlagByKey", () => {
-  it("should fetch", async () => {
+  it("should fetch a flag with key", async () => {
     const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
     if (!connectionString)
       throw new Error("AZURE_CONFIG_ACCESS_STRING env missing");
 
+    const key = ".appconfig.featureflag/testFlag2";
     const client = new AppConfigurationClient(connectionString);
-    const flag = await fetchFeatureFlagByKey(
-      client,
-      ".appconfig.featureflag/testFlag2"
-    );
+    const flag = await fetchFeatureFlagByKey(client, key);
     console.log(flag);
 
     expect(flag).not.toEqual({});

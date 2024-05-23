@@ -44,12 +44,9 @@ export function validateFeatureFlag(
       continue;
     }
 
-    const groups =
-      options.groups?.filter((g): g is string => g !== undefined) ?? [];
-    const users = options.user ? [options.user] : [];
     const filterOptions: FeatureFlagCustomFilterValidatorOptions = {
-      groups,
-      users,
+      groups: options.groups ?? [],
+      users: options.users ?? [],
     };
 
     if (checkIsTargetingClientFilter(filter)) {

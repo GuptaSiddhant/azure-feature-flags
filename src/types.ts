@@ -59,9 +59,9 @@ export type FeatureFlagCustomFilterValidators = Record<
 
 export type FeatureFlagValidateOptions = {
   /** Groups to validate the feature flag against */
-  groups?: Array<string | undefined>;
+  groups?: Array<string>;
   /** User ID to validate the feature flag against */
-  user?: string;
+  users?: Array<string>;
   /** Handle and validate custom filters */
   customFilterValidators?: FeatureFlagCustomFilterValidators;
 };
