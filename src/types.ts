@@ -75,5 +75,5 @@ export type FeatureFlagValidateOptions = {
 export type FeatureFlagHandleRollout = (
   flagKey: string,
   rolloutPercentage: number,
-  groupName: string | undefined
+  groupName?: string
 ) => boolean;

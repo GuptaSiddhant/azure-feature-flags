@@ -10,7 +10,7 @@ vi.useFakeTimers();
 
 describe("Without filters", () => {
   it("should return false for invalid feature flag", () => {
-    expect(validateFeatureFlag(undefined)).toBe(false);
+    expect(validateFeatureFlag(undefined)).false;
   });
 
   it("should return false for disabled feature flag", () => {
@@ -20,7 +20,7 @@ describe("Without filters", () => {
       conditions: { client_filters: [] },
     };
 
-    expect(validateFeatureFlag(featureFlag)).toBe(false);
+    expect(validateFeatureFlag(featureFlag)).false;
   });
 
   it("should return true for valid and enabled feature flag with no filters", () => {
@@ -30,7 +30,7 @@ describe("Without filters", () => {
       conditions: { client_filters: [] },
     };
 
-    expect(validateFeatureFlag(featureFlag)).toBe(true);
+    expect(validateFeatureFlag(featureFlag)).true;
   });
 });
 
@@ -64,38 +64,32 @@ describe("Targeting filter", () => {
 
   // Groups
   it("should return false where included locale group is missing", () => {
-    expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).toBe(false);
+    expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).false;
   });
   it("should return true where included locale group is matching", () => {
-    expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).toBe(true);
+    expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).true;
   });
   it("should return false where excluded locale group is matching", () => {
-    expect(validateFeatureFlag(featureFlag, { groups: ["de-de"] })).toBe(false);
+    expect(validateFeatureFlag(featureFlag, { groups: ["de-de"] })).false;
   });
   it("should return false where included locale group is matching with RolloutPercentage=0", () => {
-    expect(validateFeatureFlag(featureFlag, { groups: ["fi-fi"] })).toBe(false);
+    expect(validateFeatureFlag(featureFlag, { groups: ["fi-fi"] })).false;
   });
 
   // Users
   it("should return false where included user is missing", () => {
-    expect(validateFeatureFlag(featureFlag, { users: ["test-user-5"] })).toBe(
-      false
-    );
+    expect(validateFeatureFlag(featureFlag, { users: ["test-user-5"] })).false;
   });
   it("should return true where included user is matching", () => {
-    expect(validateFeatureFlag(featureFlag, { users: ["test-user-1"] })).toBe(
-      true
-    );
+    expect(validateFeatureFlag(featureFlag, { users: ["test-user-1"] })).true;
   });
   it("should return false where excluded user is matching", () => {
-    expect(validateFeatureFlag(featureFlag, { users: ["test-user-3"] })).toBe(
-      false
-    );
+    expect(validateFeatureFlag(featureFlag, { users: ["test-user-3"] })).false;
   });
 
   // Default
   it("should return true if no options are provided and DefaultRollout > 0", () => {
-    expect(validateFeatureFlag(featureFlag, {})).toBe(true);
+    expect(validateFeatureFlag(featureFlag, {})).true;
   });
 
   // This test should be at the end of block because it modifies the feature flag object
@@ -103,7 +97,7 @@ describe("Targeting filter", () => {
     featureFlag.conditions.clientFilters![0].parameters[
       "Audience"
     ].DefaultRolloutPercentage = 0;
-    expect(validateFeatureFlag(featureFlag, {})).toBe(false);
+    expect(validateFeatureFlag(featureFlag, {})).false;
   });
 
   it("should use custom handleRollout callback", () => {
@@ -115,13 +109,19 @@ describe("Targeting filter", () => {
       if (!groupName) return percentage > 50;
       return percentage > 75;
     };
-    expect(validateFeatureFlag(featureFlag, { handleRollout })).toBe(false);
+    expect(validateFeatureFlag(featureFlag, { handleRollout })).false;
     expect(
-      validateFeatureFlag(featureFlag, { groups: ["sv-se"], handleRollout })
-    ).toBe(false);
+      validateFeatureFlag(featureFlag, {
+        groups: ["sv-se"],
+        handleRollout,
+      })
+    ).false;
     expect(
-      validateFeatureFlag(featureFlag, { groups: ["en-gb"], handleRollout })
-    ).toBe(true);
+      validateFeatureFlag(featureFlag, {
+        groups: ["en-gb"],
+        handleRollout,
+      })
+    ).true;
   });
 });
 
@@ -144,15 +144,15 @@ describe("Time window filter", () => {
 
   it("should return false before Start date", () => {
     vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag)).toBe(false);
+    expect(validateFeatureFlag(featureFlag)).false;
   });
   it("should return false after End date", () => {
     vi.setSystemTime(new Date("Thu, 18 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag)).toBe(false);
+    expect(validateFeatureFlag(featureFlag)).false;
   });
   it("should return true between Start and End date", () => {
     vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag)).toBe(true);
+    expect(validateFeatureFlag(featureFlag)).true;
   });
 
   it("should throw error if both Start and End are missing (treat as custom filter)", () => {
@@ -205,7 +205,7 @@ describe("Custom filter", () => {
           "my-filter": (filter) => filter.parameters["foo"] === "abc",
         },
       })
-    ).toBe(false);
+    ).false;
   });
 
   it("should return true when custom filter does correctly validate", () => {
@@ -215,7 +215,7 @@ describe("Custom filter", () => {
           "my-filter": (filter) => filter.parameters["foo"] === "bar",
         },
       })
-    ).toBe(true);
+    ).true;
   });
 });
 
@@ -247,14 +247,14 @@ describe("Multiple filters (OR)", () => {
 
   it("should return true if any filter is valid", () => {
     vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).toBe(true);
+    expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).true;
 
     vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).toBe(true);
+    expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).true;
   });
   it("should return false if all filters are invalid", () => {
     vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).toBe(false);
+    expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).false;
   });
 });
 
@@ -287,13 +287,13 @@ describe("Multiple filters (AND)", () => {
 
   it("should return true if all filters are valid", () => {
     vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).toBe(true);
+    expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).true;
   });
   it("should return false if any filter is invalid", () => {
     vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).toBe(false);
+    expect(validateFeatureFlag(featureFlag, { groups: ["en-gb"] })).false;
 
     vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).toBe(false);
+    expect(validateFeatureFlag(featureFlag, { groups: ["en-us"] })).false;
   });
 });

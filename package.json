@@ -41,6 +41,11 @@
       "types": "./esm/index.d.ts",
       "import": "./esm/index.js",
       "require": "./cjs/index.js"
+    },
+    "./rollout-handlers": {
+      "types": "./esm/rollout-handlers.d.ts",
+      "import": "./esm/rollout-handlers.js",
+      "require": "./cjs/rollout-handlers.js"
     }
   },
   "scripts": {

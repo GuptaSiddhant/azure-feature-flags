@@ -31,7 +31,7 @@ import { fetchFeatureFlags } from "azure-feature-flags";
 const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
 const client = new AppConfigurationClient(connectionString);
 
-const featureFlags: FeatureFlagsRecord = await fetchFeatureFlags(client);
+const featureFlags: FeatureFlagsRecord = fetchFeatureFlags(client);
 ```
 
 ### `fetchFeatureFlagByKey`
@@ -46,7 +46,7 @@ const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
 const client = new AppConfigurationClient(connectionString);
 const featureFlagKey = "your-feature-flag-key";
 
-const featureFlag: FeatureFlag | null = await fetchFeatureFlagByKey(
+const featureFlag: FeatureFlag | null = fetchFeatureFlagByKey(
   client,
   featureFlagKey
 );
@@ -72,8 +72,6 @@ const isValid: boolean = validateFeatureFlag(featureFlag);
 
 When a group(s) or user(s) are provided, the value is matched against the targeted audiences (both included and excluded) set in the Azure App Config.
 
-> Note: This package does not manage rollout functionality by itself. By default, any rollout percentage set to `> 0` is considered valid. This behaviour can be overridden by providing a custom `handleRollout` callback in the options.
-
 ```ts
 import { validateFeatureFlag } from "azure-feature-flags";
 
@@ -85,11 +83,33 @@ const isValid: boolean = validateFeatureFlag(featureFlag, {
 
 ##### Handle rollout
 
+> Note: By default, any rollout percentage set to `> 0` is considered valid. This behaviour can be overridden by providing a custom `handleRollout` callback in the options.
+
+###### Built-in handlers
+
+The package exports some rollout handlers which can be used instead of creating your own.
+
+- `handleRolloutWithHash`
+
+  ```ts
+  import {
+    validateFeatureFlag,
+    handleRolloutWithHash,
+  } from "azure-feature-flags";
+
+  const isValid: boolean = validateFeatureFlag(featureFlag, {
+    groups: ["editor"],
+    handleRollout: handleRolloutWithHash,
+  });
+  ```
+
+###### Custom `handleRollout`
+
 ```ts
 import { validateFeatureFlag } from "azure-feature-flags";
 import type { FeatureFlagHandleRollout } from "azure-feature-flags";
 
-const handleRollout: FeatureFlagHandleRollout = (
+const handleRollout: FeatureFlagHandleRollout = async (
   flagKey,
   rolloutPercentage,
   groupName // groupName is `undefined` for `DefaultRolloutPercentage`.

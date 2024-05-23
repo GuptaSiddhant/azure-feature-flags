@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { AppConfigurationClient } from "@azure/app-configuration";
 import { fetchFeatureFlags, fetchFeatureFlagByKey } from "../src/service";
 
-describe.skip("fetchFeatureFlags", () => {
+describe.skip(fetchFeatureFlags, () => {
   it("should fetch all flags", async () => {
     const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
     if (!connectionString)
@@ -16,7 +16,7 @@ describe.skip("fetchFeatureFlags", () => {
   });
 });
 
-describe.skip("fetchFeatureFlagByKey", () => {
+describe.skip(fetchFeatureFlagByKey, () => {
   it("should fetch a flag with key", async () => {
     const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
     if (!connectionString)
