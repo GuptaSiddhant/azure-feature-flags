@@ -15,7 +15,7 @@ const flagObject = {
   displayName: undefined,
 };
 
-describe(fetchFeatureFlagByKey, () => {
+describe.concurrent(fetchFeatureFlagByKey, () => {
   it("should throw error if client is incorrect", async () => {
     await expect(() =>
       // @ts-expect-error
@@ -59,7 +59,7 @@ describe(fetchFeatureFlagByKey, () => {
   });
 });
 
-describe(fetchFeatureFlags, () => {
+describe.concurrent(fetchFeatureFlags, () => {
   it("should throw error if client is incorrect", async () => {
     // @ts-expect-error
     await expect(() => fetchFeatureFlags({})).rejects.toThrow(

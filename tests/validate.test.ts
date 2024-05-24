@@ -8,7 +8,7 @@ import { validateFeatureFlag } from "../src/validate";
 
 vi.useFakeTimers();
 
-describe("Without filters", () => {
+describe.concurrent("Without filters", () => {
   it("should return false for invalid feature flag", () => {
     expect(validateFeatureFlag(undefined)).false;
   });
@@ -34,7 +34,7 @@ describe("Without filters", () => {
   });
 });
 
-describe("Targeting filter", () => {
+describe.concurrent("Targeting filter", () => {
   const featureFlag: FeatureFlag = {
     id: "feature",
     enabled: true,
@@ -87,19 +87,6 @@ describe("Targeting filter", () => {
     expect(validateFeatureFlag(featureFlag, { users: ["test-user-3"] })).false;
   });
 
-  // Default
-  it("should return true if no options are provided and DefaultRollout > 0", () => {
-    expect(validateFeatureFlag(featureFlag, {})).true;
-  });
-
-  // This test should be at the end of block because it modifies the feature flag object
-  it("should return false if no options are provided and DefaultRollout = 0", () => {
-    featureFlag.conditions.clientFilters![0].parameters[
-      "Audience"
-    ].DefaultRolloutPercentage = 0;
-    expect(validateFeatureFlag(featureFlag, {})).false;
-  });
-
   it("should use custom handleRollout callback", () => {
     const handleRollout: FeatureFlagHandleRollout = (
       _key,
@@ -123,9 +110,25 @@ describe("Targeting filter", () => {
       })
     ).true;
   });
+
+  // Default
+  it("should return true if no options are provided and DefaultRollout > 0", () => {
+    expect(validateFeatureFlag(featureFlag, {})).true;
+  });
+
+  // This test should be at the end of block because it modifies the feature flag object
+  it.sequential(
+    "should return false if no options are provided and DefaultRollout = 0",
+    () => {
+      featureFlag.conditions.clientFilters![0].parameters[
+        "Audience"
+      ].DefaultRolloutPercentage = 0;
+      expect(validateFeatureFlag(featureFlag, {})).false;
+    }
+  );
 });
 
-describe("Time window filter", () => {
+describe.concurrent("Time window filter", () => {
   const featureFlag: FeatureFlag = {
     id: "feature",
     enabled: true,
@@ -184,7 +187,7 @@ describe("Time window filter", () => {
   });
 });
 
-describe("Custom filter", () => {
+describe.concurrent("Custom filter", () => {
   const customFilter = { name: "my-filter", parameters: { foo: "bar" } };
   const featureFlag: FeatureFlag = {
     id: "feature",
@@ -219,7 +222,7 @@ describe("Custom filter", () => {
   });
 });
 
-describe("Multiple filters (OR)", () => {
+describe.concurrent("Multiple filters (OR)", () => {
   const featureFlag: FeatureFlag = {
     id: "feature",
     enabled: true,
@@ -258,7 +261,7 @@ describe("Multiple filters (OR)", () => {
   });
 });
 
-describe("Multiple filters (AND)", () => {
+describe.concurrent("Multiple filters (AND)", () => {
   const featureFlag: FeatureFlag = {
     id: "feature",
     enabled: true,

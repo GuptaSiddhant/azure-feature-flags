@@ -89,7 +89,28 @@ const isValid: boolean = validateFeatureFlag(featureFlag, {
 
 The package exports some rollout handlers which can be used instead of creating your own.
 
+- `handleRolloutWithIncrement`
+
+  The numbers on incremented on both sides (true and false) according to their ratio
+  until a limit has reached. Then the increments are reset and it begins again.
+
+  For eg. For a 50% rollout, first run will be true, second be false, and then repeat.
+  For a 75% rollout, first 3 runs will be true and then a false, and then repeat.
+
+  ```ts
+  import { validateFeatureFlag } from "azure-feature-flags";
+  import { handleRolloutWithIncrement } from "azure-feature-flags/rollout";
+
+  const isValid: boolean = validateFeatureFlag(featureFlag, {
+    groups: ["editor"],
+    handleRollout: handleRolloutWithIncrement,
+  });
+  ```
+
 - `handleRolloutWithHash`
+
+  For a given flag-key and groupName, the function generates a static hash.
+  That hash is converted to a number and compare with rolloutPercentage
 
   ```ts
   import { validateFeatureFlag } from "azure-feature-flags";
