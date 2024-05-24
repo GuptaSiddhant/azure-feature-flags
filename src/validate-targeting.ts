@@ -9,7 +9,7 @@ export function checkIsTargetingClientFilter(
   filter: FeatureFlagClientFilter
 ): filter is FeatureFlagTargetingFilter {
   const Audience =
-    filter?.name == "Microsoft.Targeting" &&
+    filter?.name === "Microsoft.Targeting" &&
     filter.parameters &&
     filter.parameters["Audience"];
 

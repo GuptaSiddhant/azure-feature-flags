@@ -109,7 +109,7 @@ The package exports some rollout handlers which can be used instead of creating 
 import { validateFeatureFlag } from "azure-feature-flags";
 import type { FeatureFlagHandleRollout } from "azure-feature-flags";
 
-const handleRollout: FeatureFlagHandleRollout = async (
+const handleRollout: FeatureFlagHandleRollout = (
   flagKey,
   rolloutPercentage,
   groupName // groupName is `undefined` for `DefaultRolloutPercentage`.
