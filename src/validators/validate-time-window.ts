@@ -1,9 +1,9 @@
 import type {
   FeatureFlagClientFilter,
   FeatureFlagTimeWindowFilter,
-} from "./types.js";
+} from "../types.js";
 
-export function isTimeWindowClientFilter(
+export function checkIsTimeWindowClientFilter(
   filter: FeatureFlagClientFilter
 ): filter is FeatureFlagTimeWindowFilter {
   const parameters =

@@ -3,7 +3,7 @@ import type {
   FeatureFlagClientFilter,
   FeatureFlagTargetingFilter,
   FeatureFlagHandleRollout,
-} from "./types.js";
+} from "../types.js";
 
 export function checkIsTargetingClientFilter(
   filter: FeatureFlagClientFilter

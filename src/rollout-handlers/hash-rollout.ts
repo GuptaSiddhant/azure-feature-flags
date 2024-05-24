@@ -1,5 +1,5 @@
-import { sha1 } from "./sha-1.js";
-import type { FeatureFlagHandleRollout } from "./types.js";
+import type { FeatureFlagHandleRollout } from "../types.js";
+import { sha1 } from "../utils/hash-sha-1.js";
 
 /**
  * Handle rollout using crypto-hash.

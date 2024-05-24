@@ -1,6 +1,6 @@
 {
   "name": "azure-feature-flags",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "type": "module",
   "description": "Fetch and validate feature flags managed via Azure App Configuration.",
   "author": {
@@ -17,7 +17,9 @@
   },
   "files": [
     "cjs",
-    "esm"
+    "esm",
+    "*.js",
+    "*.d.ts"
   ],
   "keywords": [
     "azure",
@@ -33,9 +35,6 @@
     "percentage"
   ],
   "sideEffects": false,
-  "main": "./cjs/index.js",
-  "module": "./esm/index.js",
-  "types": "./esm/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -43,23 +42,28 @@
       "import": "./esm/index.js",
       "require": "./cjs/index.js"
     },
-    "./rollout-handlers": {
-      "types": "./esm/rollout-handlers.d.ts",
-      "import": "./esm/rollout-handlers.js",
-      "require": "./cjs/rollout-handlers.js"
+    "./rollout": {
+      "types": "./esm/rollout.d.ts",
+      "import": "./esm/rollout.js",
+      "require": "./cjs/rollout.js"
     }
   },
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./esm/index.d.ts",
   "scripts": {
-    "build": "yarn build:cjs && yarn build:esm",
+    "build": "yarn build:cjs & yarn build:esm",
     "build:cjs": "rm -rf cjs; tsc -p tsconfig.cjs.json",
     "build:esm": "rm -rf esm; tsc",
     "prepublishOnly": " yarn test && yarn build",
     "test": "vitest run --coverage",
+    "test:server": "node ./scripts/run.mjs",
     "test:watch": "vitest --coverage"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^1.6.0",
+    "dotenv": "^16.4.5",
     "typescript": "^5.4.0",
     "vitest": "^1.6.0"
   },

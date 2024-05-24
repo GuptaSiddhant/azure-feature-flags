@@ -762,6 +762,7 @@ __metadata:
     "@azure/app-configuration": "npm:^1"
     "@types/node": "npm:^20.0.0"
     "@vitest/coverage-v8": "npm:^1.6.0"
+    dotenv: "npm:^16.4.5"
     typescript: "npm:^5.4.0"
     vitest: "npm:^1.6.0"
   languageName: unknown
@@ -924,6 +925,13 @@ __metadata:
   version: 29.6.3
   resolution: "diff-sequences@npm:29.6.3"
   checksum: 10c0/32e27ac7dbffdf2fb0eb5a84efd98a9ad084fbabd5ac9abb8757c6770d5320d2acd172830b28c4add29bb873d59420601dfc805ac4064330ce59b1adfd0593b2
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.4.5":
+  version: 16.4.5
+  resolution: "dotenv@npm:16.4.5"
+  checksum: 10c0/48d92870076832af0418b13acd6e5a5a3e83bb00df690d9812e94b24aff62b88ade955ac99a05501305b8dc8f1b0ee7638b18493deb6fe93d680e5220936292f
   languageName: node
   linkType: hard
 

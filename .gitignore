@@ -28,3 +28,4 @@ public/sprite*
 !.yarn/versions
 
 *storybook.log
+.npmrc

@@ -92,10 +92,8 @@ The package exports some rollout handlers which can be used instead of creating 
 - `handleRolloutWithHash`
 
   ```ts
-  import {
-    validateFeatureFlag,
-    handleRolloutWithHash,
-  } from "azure-feature-flags";
+  import { validateFeatureFlag } from "azure-feature-flags";
+  import { handleRolloutWithHash } from "azure-feature-flags/rollout";
 
   const isValid: boolean = validateFeatureFlag(featureFlag, {
     groups: ["editor"],

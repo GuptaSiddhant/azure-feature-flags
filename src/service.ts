@@ -8,7 +8,7 @@ import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
 export async function fetchFeatureFlags(
   client: AppConfigurationClient
 ): Promise<FeatureFlagsRecord> {
-  if (!(client instanceof AppConfigurationClient)) {
+  if (!("listConfigurationSettings" in client)) {
     throw new Error("'client' is not valid Azure AppConfigurationClient");
   }
 
@@ -38,11 +38,11 @@ export async function fetchFeatureFlagByKey(
   client: AppConfigurationClient,
   key: string
 ): Promise<FeatureFlag | null> {
-  if (!(client instanceof AppConfigurationClient)) {
+  if (!("getConfigurationSetting" in client)) {
     throw new Error("'client' is not valid Azure AppConfigurationClient");
   }
   if (!key) {
-    throw new Error("Feature flag 'key' is missing");
+    throw new Error("Feature flag key is missing");
   }
   if (!key.startsWith(featureFlagPrefix)) {
     key = `${featureFlagPrefix}${key}`;
@@ -50,6 +50,7 @@ export async function fetchFeatureFlagByKey(
 
   try {
     const response = await client.getConfigurationSetting({ key });
+
     if (response && typeof response === "object" && response.value) {
       return JSON.parse(response.value);
     } else {

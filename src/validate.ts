@@ -6,11 +6,11 @@ import type {
 import {
   checkIsTargetingClientFilter,
   validateFeatureFlagTargetingFilter,
-} from "./validate-targeting.js";
+} from "./validators/validate-targeting.js";
 import {
-  isTimeWindowClientFilter,
+  checkIsTimeWindowClientFilter,
   validateFeatureFlagTimeWindowFilter,
-} from "./validate-time-window.js";
+} from "./validators/validate-time-window.js";
 
 /**
  * Validate the feature-flag object with filters and rollout.
@@ -37,7 +37,7 @@ export function validateFeatureFlag(
 
   let validFilters = 0;
   for (const filter of filters) {
-    if (isTimeWindowClientFilter(filter)) {
+    if (checkIsTimeWindowClientFilter(filter)) {
       if (validateFeatureFlagTimeWindowFilter(filter)) {
         validFilters += 1;
       }

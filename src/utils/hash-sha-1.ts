@@ -1,4 +1,16 @@
 // @ts-nocheck
+/* c8 ignore start */
+
+/**
+ * Hash as single function
+ */
+export function sha1(message: string): string {
+  const buf = new Uint32Array(16);
+  const state = init();
+  finalizeStr(preprocess(message, buf, state), message.length, buf, state);
+
+  return out(state);
+}
 
 /**
  * Gets a uint32 from string in big-endian order order
@@ -9,18 +21,6 @@ function s2i(str: string, pos: number) {
     (str.charCodeAt(pos + 1) << 16) ^
     (str.charCodeAt(pos + 2) << 8) ^
     str.charCodeAt(pos + 3)
-  );
-}
-
-/**
- * Returns a uint32 as a string in big-endian order order
- */
-function i2s(data: number) {
-  return (
-    String.fromCharCode((data >> 24) & 0xff) +
-    String.fromCharCode((data >> 16) & 0xff) +
-    String.fromCharCode((data >> 8) & 0xff) +
-    String.fromCharCode(data & 0xff)
   );
 }
 
@@ -208,7 +208,7 @@ function finish(
 /**
  * Adds padding to message
  */
-function finalizestr(
+function finalizeStr(
   chunk: string,
   len: number,
   buf: Uint32Array,
@@ -240,15 +240,4 @@ function out(state: Uint32Array) {
     i2h(state[3]) +
     i2h(state[4])
   );
-}
-
-/**
- * Hash as single function
- */
-export function sha1(message: string): string {
-  const buf = new Uint32Array(16);
-  const state = init();
-  finalizestr(preprocess(message, buf, state), message.length, buf, state);
-
-  return out(state);
 }
