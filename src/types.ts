@@ -1,3 +1,5 @@
+import { ListConfigurationSettingsOptions } from "@azure/app-configuration";
+
 export type FeatureFlagsRecord = Record<string, FeatureFlag>;
 
 export type FeatureFlag = {
@@ -77,3 +79,8 @@ export type FeatureFlagHandleRollout = (
   rolloutPercentage: number,
   groupName?: string
 ) => boolean;
+
+export type GetFeatureFlagsOptions = Omit<
+  ListConfigurationSettingsOptions,
+  "keyFilter"
+>;

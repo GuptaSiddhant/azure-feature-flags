@@ -1,8 +1,24 @@
 # Azure Feature Flags
 
-**Fetch and validate feature flags from Azure Configuration.**
+**get and validate feature flags from Azure Configuration.**
 
 This package depends on `@azure/app-configuration` to generate the Azure `AppConfigurationClient`.
+
+- [Install](#install)
+- [Service API](#service-api)
+  - [getFeatureFlagsRecord](#getfeatureflagsrecord)
+  - [getFeatureFlagsList](#getfeatureflagslist)
+  - [getFeatureFlagByKey](#getFeatureFlagByKey)
+  - [setFeatureFlag](#setFeatureFlag)
+  - [deleteFeatureFlag](#deleteFeatureFlag)
+- [Validation API (`validateFeatureFlag`)](#validation-api)
+  - [Default and TimeWindow filter](#default-and-timewindow-filter)
+  - [Targeting filter](#targeting-filter)
+    - [Handle rollout](#handle-rollout)
+      - [Built-in handlers](#built-in-handlers)
+      - [Custom handler](#custom-handler)
+  - [Custom filter](#custom-filter)
+- [License](#license)
 
 ## Install
 
@@ -18,62 +34,110 @@ yarn add azure-feature-flags
 bun add azure-feature-flags
 ```
 
-## Usage
+## Service API
 
-### `fetchFeatureFlags`
-
-Fetch all feature flags from Azure App Config and return them as a record.
+The Service API directly interact with Azure App Config. All Service API accepts Azure App Configuration `client` as first parameter which must be generated with the `@azure/app-configuration` package.
 
 ```ts
 import { AppConfigurationClient } from "@azure/app-configuration";
-import { fetchFeatureFlags } from "azure-feature-flags";
 
 const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
 const client = new AppConfigurationClient(connectionString);
-
-const featureFlags: FeatureFlagsRecord = fetchFeatureFlags(client);
 ```
 
-### `fetchFeatureFlagByKey`
+> Note, all exports can be imported from root package `azure-feature-flags` but for sake of tree-shaking, they are made available from `azure-feature-flags/service`
 
-Fetch feature flag data for specific key.
+### `getFeatureFlagsRecord`
+
+Get all feature flags from Azure App Config and return them as a record.
 
 ```ts
-import { AppConfigurationClient } from "@azure/app-configuration";
-import { fetchFeatureFlags } from "azure-feature-flags";
+import { getFeatureFlagsRecord } from "azure-feature-flags/service";
+import type { FeatureFlagsRecord } from "azure-feature-flags";
 
-const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
-const client = new AppConfigurationClient(connectionString);
+const featureFlags: FeatureFlagsRecord = await getFeatureFlagsRecord(client);
+```
+
+### `getFeatureFlagsList`
+
+Get all feature flags from Azure App Config and return them as a list/array.
+
+```ts
+import { getFeatureFlagsList } from "azure-feature-flags/service";
+import type { FeatureFlag } from "azure-feature-flags";
+
+const featureFlags: FeatureFlag[] = await getFeatureFlagsList(client);
+```
+
+### `getFeatureFlagByKey`
+
+Get feature flag data for specific key.
+
+```ts
+import { getFeatureFlagByKey } from "azure-feature-flags/service";
+import type { FeatureFlag } from "azure-feature-flags";
+
 const featureFlagKey = "your-feature-flag-key";
 
-const featureFlag: FeatureFlag | null = fetchFeatureFlagByKey(
+const featureFlag: FeatureFlag | null = await getFeatureFlagByKey(
   client,
   featureFlagKey
 );
 ```
 
-### `validateFeatureFlag`
+### `setFeatureFlag`
 
-Validate a feature-flag object against filters/conditions.
+Set a new feature flag data or update existing one
+
+```ts
+import { setFeatureFlag } from "azure-feature-flags/service";
+import type { FeatureFlag } from "azure-feature-flags";
+
+const featureFlag: FeatureFlag = {
+  id: "your-feature-flag-id",
+  enabled: true,
+  conditions: { client_filters: [] },
+};
+
+const success: boolean = await setFeatureFlag(client, featureFlag);
+```
+
+### `deleteFeatureFlag`
+
+Get feature flag data for specific key.
+
+```ts
+import { deleteFeatureFlag } from "azure-feature-flags/service";
+
+const featureFlagKey = "your-feature-flag-key";
+
+const deleted: boolean = await deleteFeatureFlag(client, featureFlagKey);
+```
+
+## Validation API
+
+**`validateFeatureFlag`**: Validate a feature-flag object against filters/conditions.
 
 > Note: The function will `throw` if a custom filter is encountered without a validator. Hence, it is recommended to wrap the function call in try-catch for handling unsupported custom filters.
 
-#### Default and TimeWindow filter
+> Note, all exports can be imported from root package `azure-feature-flags` but for sake of tree-shaking, they are made available from `azure-feature-flags/validate`
+
+### Default and TimeWindow filter
 
 If filters are not set on the flag, the validation returns the value set in `featureFlag.enabled`. Otherwise, the `TimeWindow` filter is also tested against current time.
 
 ```ts
-import { validateFeatureFlag } from "azure-feature-flags";
+import { validateFeatureFlag } from "azure-feature-flags/validate";
 
 const isValid: boolean = validateFeatureFlag(featureFlag);
 ```
 
-#### Targeting Audience filter With Groups/User
+### Targeting filter
 
 When a group(s) or user(s) are provided, the value is matched against the targeted audiences (both included and excluded) set in the Azure App Config.
 
 ```ts
-import { validateFeatureFlag } from "azure-feature-flags";
+import { validateFeatureFlag } from "azure-feature-flags/validate";
 
 const isValid: boolean = validateFeatureFlag(featureFlag, {
   groups: ["editor"],
@@ -81,11 +145,11 @@ const isValid: boolean = validateFeatureFlag(featureFlag, {
 });
 ```
 
-##### Handle rollout
+#### Handle rollout
 
 > Note: By default, any rollout percentage set to `> 0` is considered valid. This behaviour can be overridden by providing a custom `handleRollout` callback in the options.
 
-###### Built-in handlers
+##### Built-in handlers
 
 The package exports some rollout handlers which can be used instead of creating your own.
 
@@ -98,7 +162,7 @@ The package exports some rollout handlers which can be used instead of creating 
   For a 75% rollout, first 3 runs will be true and then a false, and then repeat.
 
   ```ts
-  import { validateFeatureFlag } from "azure-feature-flags";
+  import { validateFeatureFlag } from "azure-feature-flags/validate";
   import { handleRolloutWithIncrement } from "azure-feature-flags/rollout";
 
   const isValid: boolean = validateFeatureFlag(featureFlag, {
@@ -113,7 +177,7 @@ The package exports some rollout handlers which can be used instead of creating 
   That hash is converted to a number and compare with rolloutPercentage
 
   ```ts
-  import { validateFeatureFlag } from "azure-feature-flags";
+  import { validateFeatureFlag } from "azure-feature-flags/validate";
   import { handleRolloutWithHash } from "azure-feature-flags/rollout";
 
   const isValid: boolean = validateFeatureFlag(featureFlag, {
@@ -122,10 +186,10 @@ The package exports some rollout handlers which can be used instead of creating 
   });
   ```
 
-###### Custom `handleRollout`
+##### Custom handler
 
 ```ts
-import { validateFeatureFlag } from "azure-feature-flags";
+import { validateFeatureFlag } from "azure-feature-flags/validate";
 import type { FeatureFlagHandleRollout } from "azure-feature-flags";
 
 const handleRollout: FeatureFlagHandleRollout = (
@@ -143,14 +207,14 @@ const isValid: boolean = validateFeatureFlag(featureFlag, {
 });
 ```
 
-#### With custom filters
+### Custom filter
 
 Azure allows for custom filters and they need to be manually tested against. The function accepts an object of custom filters to test against.
 
 The validator function received the `filter` object set in Azure Config as first argument, and groups & users are 2nd param.
 
 ```ts
-import { validateFeatureFlag } from "azure-feature-flags";
+import { validateFeatureFlag } from "azure-feature-flags/validate";
 import type { FeatureFlagCustomFilterValidator } from "azure-feature-flags";
 
 const myFilterValidator: FeatureFlagCustomFilterValidator = (

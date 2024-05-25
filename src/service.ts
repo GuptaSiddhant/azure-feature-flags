@@ -1,46 +1,60 @@
 import {
-  AppConfigurationClient,
+  featureFlagContentType,
   featureFlagPrefix,
   parseFeatureFlag,
 } from "@azure/app-configuration";
-import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
+import type {
+  AddConfigurationSettingParam,
+  AppConfigurationClient,
+  ConfigurationSettingParam,
+} from "@azure/app-configuration";
+import {
+  invariantAppConfigurationClient,
+  iterateAppConfigurationFeatureFlags,
+} from "./utils/app-config.js";
+import type {
+  FeatureFlag,
+  FeatureFlagsRecord,
+  GetFeatureFlagsOptions,
+} from "./types.js";
 
-export async function fetchFeatureFlags(
-  client: AppConfigurationClient
+// Getters
+
+export async function getFeatureFlagsRecord(
+  client: AppConfigurationClient,
+  options: GetFeatureFlagsOptions = {}
 ): Promise<FeatureFlagsRecord> {
-  if (!("listConfigurationSettings" in client)) {
-    throw new Error("'client' is not valid Azure AppConfigurationClient");
-  }
-
-  const iterator = client.listConfigurationSettings({
-    keyFilter: `${featureFlagPrefix}*`,
-  });
+  invariantAppConfigurationClient(client, "listConfigurationSettings");
 
   const record: FeatureFlagsRecord = {};
-
-  let done = false;
-  while (!done) {
-    const entry = await iterator.next();
-    if (entry.done) {
-      done = true;
-      break;
-    }
-    try {
-      const featureFlag = parseFeatureFlag(entry.value).value as FeatureFlag;
-      record[featureFlag.id] = featureFlag;
-    } catch {}
-  }
+  await iterateAppConfigurationFeatureFlags(client, options, (featureFlag) => {
+    record[featureFlag.id] = featureFlag;
+  });
 
   return record;
 }
 
-export async function fetchFeatureFlagByKey(
+export async function getFeatureFlagsList(
   client: AppConfigurationClient,
-  key: string
+  options: GetFeatureFlagsOptions = {}
+): Promise<FeatureFlag[]> {
+  invariantAppConfigurationClient(client, "listConfigurationSettings");
+
+  const list: FeatureFlag[] = [];
+  await iterateAppConfigurationFeatureFlags(client, options, (featureFlag) =>
+    list.push(featureFlag)
+  );
+
+  return list;
+}
+
+export async function getFeatureFlagByKey(
+  client: AppConfigurationClient,
+  key: string,
+  label?: string
 ): Promise<FeatureFlag | null> {
-  if (!("getConfigurationSetting" in client)) {
-    throw new Error("'client' is not valid Azure AppConfigurationClient");
-  }
+  invariantAppConfigurationClient(client, "getConfigurationSetting");
+
   if (!key) {
     throw new Error("Feature flag key is missing");
   }
@@ -49,15 +63,67 @@ export async function fetchFeatureFlagByKey(
   }
 
   try {
-    const response = await client.getConfigurationSetting({ key });
+    const setting = await client.getConfigurationSetting({ key, label });
 
-    if (response && typeof response === "object" && response.value) {
-      return JSON.parse(response.value);
-    } else {
-      return null;
-    }
+    return (parseFeatureFlag(setting).value as FeatureFlag) ?? null;
   } catch (error) {
-    console.error("Error fetching feature flag:", error);
     return null;
+  }
+}
+
+// Setter
+
+export async function setFeatureFlag(
+  client: AppConfigurationClient,
+  featureFlag: FeatureFlag,
+  options: Omit<ConfigurationSettingParam, "key" | "value" | "contentType"> = {}
+): Promise<boolean> {
+  invariantAppConfigurationClient(client, "addConfigurationSetting");
+  invariantAppConfigurationClient(client, "setConfigurationSetting");
+
+  const key = `${featureFlagPrefix}${featureFlag.id}`;
+  try {
+    const setting = await client.getConfigurationSetting({ key });
+    Object.assign(setting, options);
+    setting.value = JSON.stringify(featureFlag);
+    await client.setConfigurationSetting(setting);
+
+    return true;
+  } catch {
+    try {
+      const setting: AddConfigurationSettingParam = {
+        ...options,
+        key,
+        value: JSON.stringify(featureFlag),
+        contentType: featureFlagContentType,
+      };
+      await client.addConfigurationSetting(setting);
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+// Delete-er
+
+export async function deleteFeatureFlag(
+  client: AppConfigurationClient,
+  key: string,
+  label?: string
+): Promise<boolean> {
+  invariantAppConfigurationClient(client, "deleteConfigurationSetting");
+
+  if (!key.startsWith(featureFlagPrefix)) {
+    key = `${featureFlagPrefix}${key}`;
+  }
+
+  try {
+    await client.deleteConfigurationSetting({ key, label });
+
+    return true;
+  } catch {
+    return false;
   }
 }

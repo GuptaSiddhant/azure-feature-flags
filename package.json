@@ -1,6 +1,6 @@
 {
   "name": "azure-feature-flags",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "type": "module",
   "description": "Fetch and validate feature flags managed via Azure App Configuration.",
   "author": {
@@ -46,6 +46,16 @@
       "types": "./esm/rollout.d.ts",
       "import": "./esm/rollout.js",
       "require": "./cjs/rollout.js"
+    },
+    "./service": {
+      "types": "./esm/service.d.ts",
+      "import": "./esm/service.js",
+      "require": "./cjs/service.js"
+    },
+    "./validate": {
+      "types": "./esm/validate.d.ts",
+      "import": "./esm/validate.js",
+      "require": "./cjs/validate.js"
     }
   },
   "main": "./cjs/index.js",

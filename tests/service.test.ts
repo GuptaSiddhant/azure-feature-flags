@@ -1,11 +1,10 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
-  featureFlagPrefix,
-  type AppConfigurationClient,
-  type GetConfigurationSettingResponse,
-} from "@azure/app-configuration";
-import { fetchFeatureFlags, fetchFeatureFlagByKey } from "../src/service";
-import { FeatureFlag } from "../src/types";
+  getFeatureFlagByKey,
+  getFeatureFlagsList,
+  getFeatureFlagsRecord,
+} from "../src/service";
+import { generateDummyClient } from "./azure-client.mock";
 
 const flagObject = {
   id: "testFlag",
@@ -15,61 +14,79 @@ const flagObject = {
   displayName: undefined,
 };
 
-describe.concurrent(fetchFeatureFlagByKey, () => {
+describe.concurrent(getFeatureFlagByKey, () => {
   it("should throw error if client is incorrect", async () => {
     await expect(() =>
       // @ts-expect-error
-      fetchFeatureFlagByKey({}, flagObject.id)
+      getFeatureFlagByKey({}, flagObject.id)
     ).rejects.toThrow("'client' is not valid Azure AppConfigurationClient");
   });
 
   it("should throw error if key is missing", async () => {
     const client = generateDummyClient(flagObject);
-    await expect(() => fetchFeatureFlagByKey(client, "")).rejects.toThrow(
+    await expect(() => getFeatureFlagByKey(client, "")).rejects.toThrow(
       "Feature flag key is missing"
     );
   });
 
   it("should return null if flag does not exits", async () => {
     const client = generateDummyClient(flagObject);
-    expect(await fetchFeatureFlagByKey(client, "otherKey")).null;
+    expect(await getFeatureFlagByKey(client, "otherKey")).null;
   });
 
   it("should return null if object is error", async () => {
     // @ts-expect-error
     const client = generateDummyClient("");
-    expect(await fetchFeatureFlagByKey(client, "w")).null;
+    expect(await getFeatureFlagByKey(client, "w")).null;
   });
 
   it("should return null something goes wrong while fetching", async () => {
     const client = generateDummyClient(flagObject, true);
-    const errorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementationOnce(() => {});
-
-    expect(await fetchFeatureFlagByKey(client, flagObject.id)).null;
-    expect(errorSpy).toHaveBeenCalled();
+    expect(await getFeatureFlagByKey(client, flagObject.id)).null;
   });
 
   it("should fetch a flag with key", async () => {
     const client = generateDummyClient(flagObject);
-    const flag = await fetchFeatureFlagByKey(client, flagObject.id);
+    const flag = await getFeatureFlagByKey(client, flagObject.id);
 
     expect(flag).toEqual(flagObject);
   });
 });
 
-describe.concurrent(fetchFeatureFlags, () => {
+describe.concurrent(getFeatureFlagsList, () => {
   it("should throw error if client is incorrect", async () => {
     // @ts-expect-error
-    await expect(() => fetchFeatureFlags({})).rejects.toThrow(
+    await expect(() => getFeatureFlagsList({})).rejects.toThrow(
       "'client' is not valid Azure AppConfigurationClient"
     );
   });
 
   it("should fetch all flags", async () => {
     const client = generateDummyClient(flagObject);
-    const flags = await fetchFeatureFlags(client);
+    const flags = await getFeatureFlagsList(client);
+
+    expect(flags).toEqual([flagObject]);
+  });
+
+  it("should return null something goes wrong while fetching", async () => {
+    // @ts-expect-error
+    const client = generateDummyClient("", true);
+
+    expect(await getFeatureFlagsList(client)).toEqual([]);
+  });
+});
+
+describe.concurrent(getFeatureFlagsRecord, () => {
+  it("should throw error if client is incorrect", async () => {
+    // @ts-expect-error
+    await expect(() => getFeatureFlagsRecord({})).rejects.toThrow(
+      "'client' is not valid Azure AppConfigurationClient"
+    );
+  });
+
+  it("should fetch all flags", async () => {
+    const client = generateDummyClient(flagObject);
+    const flags = await getFeatureFlagsRecord(client);
 
     expect(flags).toEqual({ [flagObject.id]: flagObject });
   });
@@ -78,48 +95,6 @@ describe.concurrent(fetchFeatureFlags, () => {
     // @ts-expect-error
     const client = generateDummyClient("", true);
 
-    expect(await fetchFeatureFlags(client)).toEqual({});
+    expect(await getFeatureFlagsRecord(client)).toEqual({});
   });
 });
-
-function generateDummyClient(
-  flagObject: FeatureFlag,
-  throwError = false
-): AppConfigurationClient {
-  const flagResponse = (key: string) =>
-    ({
-      key,
-      value:
-        key === `${featureFlagPrefix}${flagObject.id}`
-          ? JSON.stringify(flagObject)
-          : "",
-      syncToken: "zAJw6V16=MTM6MTkjMzg3ODg4MjQ=;sn=38788824",
-      contentType: "application/vnd.microsoft.appconfig.ff+json;charset=utf-8",
-      lastModified: new Date("2024-05-22T13:48:52.000Z"),
-      tags: {},
-      isReadOnly: false,
-      statusCode: 200,
-      _response: {} as GetConfigurationSettingResponse["_response"],
-    } satisfies GetConfigurationSettingResponse);
-
-  return {
-    listConfigurationSettings() {
-      async function* gen() {
-        let index = 0;
-        while (index < 1) {
-          yield flagResponse(`${featureFlagPrefix}${flagObject.id}`);
-          index++;
-        }
-      }
-
-      return gen() as unknown as ReturnType<
-        AppConfigurationClient["listConfigurationSettings"]
-      >;
-    },
-
-    async getConfigurationSetting({ key }) {
-      if (throwError) throw new Error();
-      return flagResponse(key);
-    },
-  } as AppConfigurationClient;
-}
