@@ -10,6 +10,11 @@ export {
 
 export { validateFeatureFlag } from "./validate.js";
 
+export {
+  handleRolloutWithHash,
+  handleRolloutWithIncrement,
+} from "./rollout.js";
+
 export type {
   FeatureFlag,
   FeatureFlagsRecord,
