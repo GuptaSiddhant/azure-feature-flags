@@ -65,6 +65,7 @@
     "build": "yarn build:cjs & yarn build:esm",
     "build:cjs": "rm -rf cjs; tsc -p tsconfig.cjs.json",
     "build:esm": "rm -rf esm; tsc",
+    "jsr:publish": "npx -y jsr publish",
     "prepublishOnly": " yarn test && yarn build",
     "test": "vitest run --coverage",
     "test:server": "node ./scripts/run.mjs",

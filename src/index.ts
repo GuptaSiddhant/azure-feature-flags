@@ -20,11 +20,4 @@ export {
   handleRolloutWithIncrement,
 } from "./rollout.js";
 
-export type {
-  FeatureFlag,
-  FeatureFlagsRecord,
-  FeatureFlagCustomFilter,
-  FeatureFlagCustomFilterValidator,
-  FeatureFlagCustomFilterValidators,
-  FeatureFlagValidateOptions,
-} from "./types.js";
+export type * from "./types.js";

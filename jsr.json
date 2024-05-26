@@ -7,7 +7,7 @@
     "./service": "./src/service.ts",
     "./validate": "./src/validate.ts"
   },
-  "include": ["README.md", "src/**/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": [
     ".yarn",
     "scripts",
@@ -17,6 +17,7 @@
     "*.d.ts",
     "vitest.config.ts",
     "yarn.lock",
-    "*.json"
+    "*.json",
+    "*.md"
   ]
 }
