@@ -1,6 +1,6 @@
 {
   "name": "@gs/azure-feature-flags",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "exports": {
     ".": "./src/index.ts",
     "./rollout": "./src/rollout.ts",

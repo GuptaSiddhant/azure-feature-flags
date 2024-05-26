@@ -1,3 +1,10 @@
+/**
+ * @module
+ * This module contains the validate function to check
+ * if the feature flag is enabled or disabled for the
+ * given filters and groups/users.
+ */
+
 import type {
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlag,

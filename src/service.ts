@@ -1,3 +1,9 @@
+/**
+ * @module
+ * This module contains functions to query and mutate
+ * Azure App Configuration for feature flags.
+ */
+
 import {
   featureFlagContentType,
   featureFlagPrefix,

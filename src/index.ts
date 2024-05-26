@@ -1,5 +1,10 @@
 /* c8 ignore start */
 
+/**
+ * @module
+ * This module contains all the functions exported by the package.
+ */
+
 export {
   getFeatureFlagByKey,
   getFeatureFlagsRecord,
