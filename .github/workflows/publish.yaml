@@ -3,29 +3,20 @@ on:
   push:
     tags:
       - "*"
+  workflow_dispatch:
 
 env:
   NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
 jobs:
-  publish-jsr:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-      - name: Publish package to JSR
-        run: npx -y jsr publish
-
-  publish-npm:
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - name: Setup node
@@ -38,3 +29,5 @@ jobs:
       - run: yarn install
       - name: Publish to NPM
         run: npm publish
+      - name: Publish to JSR
+        run: npx -y jsr publish
