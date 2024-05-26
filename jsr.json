@@ -1,11 +1,22 @@
 {
   "name": "@gs/azure-feature-flags",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "exports": {
     ".": "./src/index.ts",
     "./rollout": "./src/rollout.ts",
     "./service": "./src/service.ts",
     "./validate": "./src/validate.ts"
   },
-  "include": ["README.md", "src/**/*.ts"]
+  "include": ["README.md", "src/**/*.ts"],
+  "exclude": [
+    ".yarn",
+    "scripts",
+    "tests",
+    ".yarnrc.yml",
+    "*.js",
+    "*.d.ts",
+    "vitest.config.ts",
+    "yarn.lock",
+    "*.json"
+  ]
 }
