@@ -5,29 +5,38 @@ on:
       - "*"
   workflow_dispatch:
 
-env:
-  NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    environment: PROD
+
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
     permissions:
       contents: read
       id-token: write
+
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: "yarn"
+
       - name: Setup NPM TOKEN
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+
       - run: yarn install
-      - name: Publish to NPM
-        run: npm publish
+
       - name: Publish to JSR
         run: npx -y jsr publish
+
+      - name: Publish to NPM
+        run: npm publish
