@@ -15,11 +15,19 @@ const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
 const jsrJson = JSON.parse(readFileSync(jsrJsonPath, "utf-8"));
 
 const version = pkgJson.version;
-jsrJson.version = version;
 
+console.log("Updating JSR version to ", version);
+jsrJson.version = version;
 writeFileSync(jsrJsonPath, JSON.stringify(jsrJson, null, 2));
 
 execSync(`git add package.json jsr.json`);
 execSync(`git commit -m 'bump to v${version}'`);
+
+console.log("Creating tag v" + version);
 execSync(`git tag -a v${version}`);
+
+console.log("Pushing to origin");
 execSync(`git push --tags`);
+execSync(`git push`);
+
+process.exit(0);
