@@ -1,6 +1,6 @@
 {
   "name": "@gs/azure-feature-flags",
-  "version": "0.4.3",
+  "version": "0.4.6",
   "exports": {
     ".": "./src/index.ts",
     "./rollout": "./src/rollout.ts",
@@ -17,7 +17,6 @@
     "*.d.ts",
     "vitest.config.ts",
     "yarn.lock",
-    "*.json",
-    "*.md"
+    "*.json"
   ]
 }

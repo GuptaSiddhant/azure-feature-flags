@@ -19,17 +19,19 @@ import {
   validateFeatureFlagTimeWindowFilter,
 } from "./validators/validate-time-window.js";
 
+export type { FeatureFlagValidateOptions, FeatureFlag };
+
 /**
  * Validate the feature-flag object with filters and rollout.
  *
  * @param featureFlag Azure Feature Flag config object
- * @param options
+ * @param options Options for validation
  * @returns if the feature flag should be enabled or not with given filters
  * @throws when a validator is not implemented to handle a custom filter.
  */
 export function validateFeatureFlag(
   featureFlag: FeatureFlag | null | undefined,
-  options: FeatureFlagValidateOptions = {}
+  options?: FeatureFlagValidateOptions
 ): boolean {
   if (!featureFlag?.enabled) {
     return false;
@@ -52,9 +54,9 @@ export function validateFeatureFlag(
     }
 
     const filterOptions: FeatureFlagCustomFilterValidatorOptions = {
-      groups: options.groups ?? [],
+      groups: options?.groups ?? [],
       key: featureFlag.id,
-      users: options.users ?? [],
+      users: options?.users ?? [],
     };
 
     if (checkIsTargetingClientFilter(filter)) {
@@ -62,7 +64,7 @@ export function validateFeatureFlag(
         validateFeatureFlagTargetingFilter(
           filter,
           filterOptions,
-          options.handleRollout
+          options?.handleRollout
         )
       ) {
         validFilters += 1;
@@ -70,7 +72,8 @@ export function validateFeatureFlag(
       continue;
     }
 
-    const customFilterValidator = options.customFilterValidators?.[filter.name];
+    const customFilterValidator =
+      options?.customFilterValidators?.[filter.name];
     if (customFilterValidator) {
       if (customFilterValidator(filter, filterOptions)) {
         validFilters += 1;

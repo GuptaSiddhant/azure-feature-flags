@@ -2,6 +2,9 @@ import { ListConfigurationSettingsOptions } from "@azure/app-configuration";
 
 export type FeatureFlagsRecord = Record<string, FeatureFlag>;
 
+/**
+ * Feature Flag based Azure App configuration.
+ */
 export type FeatureFlag = {
   conditions: {
     clientFilters?: Array<FeatureFlagClientFilter>;
@@ -14,11 +17,17 @@ export type FeatureFlag = {
   id: string;
 };
 
+/**
+ * Union of all available filter types
+ */
 export type FeatureFlagClientFilter =
   | FeatureFlagTargetingFilter
   | FeatureFlagTimeWindowFilter
   | FeatureFlagCustomFilter;
 
+/**
+ * Filter for targeting (including/excluding) audiences and controlled rollout.
+ */
 export type FeatureFlagTargetingFilter = {
   name: "Microsoft.Targeting";
   parameters: {
@@ -31,6 +40,9 @@ export type FeatureFlagTargetingFilter = {
   };
 };
 
+/**
+ * Filter for enabling/disabling feature flag according to timestamp.
+ */
 export type FeatureFlagTimeWindowFilter = {
   name: "Microsoft.TimeWindow";
   parameters:
@@ -39,27 +51,42 @@ export type FeatureFlagTimeWindowFilter = {
     | { End: string; Start: string };
 };
 
+/**
+ * Custom or user-defined filter. All parameters have `string` value.
+ */
 export type FeatureFlagCustomFilter = {
   name: string;
   parameters: Record<string, string>;
 };
 
+/**
+ * Function type for defining a validator for a custom-filter.
+ */
 export type FeatureFlagCustomFilterValidator = (
   filter: FeatureFlagCustomFilter,
   options: FeatureFlagCustomFilterValidatorOptions
 ) => boolean;
 
+/**
+ * Options that are available to a validator for a custom-filter.
+ */
 export type FeatureFlagCustomFilterValidatorOptions = {
   groups: Array<string>;
   key: string;
   users: Array<string>;
 };
 
+/**
+ * Record of all validators for custom-filters.
+ */
 export type FeatureFlagCustomFilterValidators = Record<
   string,
   FeatureFlagCustomFilterValidator
 >;
 
+/**
+ * Options for validating a Feature flag.
+ */
 export type FeatureFlagValidateOptions = {
   /** Groups to validate the feature flag against */
   groups?: Array<string>;
@@ -74,6 +101,9 @@ export type FeatureFlagValidateOptions = {
   handleRollout?: FeatureFlagHandleRollout;
 };
 
+/**
+ * Function type for defining a handler for rollout mechanism.
+ */
 export type FeatureFlagHandleRollout = (
   flagKey: string,
   rolloutPercentage: number,

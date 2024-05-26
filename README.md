@@ -2,6 +2,8 @@
 
 **get and validate feature flags from Azure Configuration.**
 
+[![JSR](https://jsr.io/badges/@gs/azure-feature-flags)](https://jsr.io/badges/@gs/azure-feature-flags)
+
 This package depends on `@azure/app-configuration` to generate the Azure `AppConfigurationClient`.
 
 - [Install](#install)
