@@ -6,7 +6,7 @@ import {
 
 const flagKey = "test-flag";
 
-describe.concurrent(handleRolloutWithHash, () => {
+describe(handleRolloutWithHash, { concurrent: true }, () => {
   it("should return true if groupName: undefined, percentage: 50", () => {
     expect(handleRolloutWithHash(flagKey, 50)).true;
   });
@@ -25,7 +25,7 @@ describe.concurrent(handleRolloutWithHash, () => {
   });
 });
 
-describe.concurrent(handleRolloutWithIncrement, () => {
+describe(handleRolloutWithIncrement, { concurrent: true }, () => {
   testIncrementRollout(0, [false], true);
   testIncrementRollout(10, [true, ...Array(9).fill(false)]);
   testIncrementRollout(25, [true, false, false, false]);

@@ -9,6 +9,7 @@ import type {
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlag,
   FeatureFlagValidateOptions,
+  FeatureFlagClientFilter,
 } from "./types.js";
 import {
   checkIsTargetingClientFilter,
@@ -38,7 +39,7 @@ export function validateFeatureFlag(
   }
 
   const filters =
-    featureFlag.conditions.client_filters ||
+    featureFlag.conditions.client_filters ??
     featureFlag.conditions.clientFilters;
   if (!filters || filters.length === 0) {
     return featureFlag.enabled;
@@ -46,44 +47,9 @@ export function validateFeatureFlag(
 
   let validFilters = 0;
   for (const filter of filters) {
-    if (checkIsTimeWindowClientFilter(filter)) {
-      if (validateFeatureFlagTimeWindowFilter(filter)) {
-        validFilters += 1;
-      }
-      continue;
+    if (validateClientFilter(filter, options, featureFlag)) {
+      validFilters += 1;
     }
-
-    const filterOptions: FeatureFlagCustomFilterValidatorOptions = {
-      groups: options?.groups ?? [],
-      key: featureFlag.id,
-      users: options?.users ?? [],
-    };
-
-    if (checkIsTargetingClientFilter(filter)) {
-      if (
-        validateFeatureFlagTargetingFilter(
-          filter,
-          filterOptions,
-          options?.handleRollout
-        )
-      ) {
-        validFilters += 1;
-      }
-      continue;
-    }
-
-    const customFilterValidator =
-      options?.customFilterValidators?.[filter.name];
-    if (customFilterValidator) {
-      if (customFilterValidator(filter, filterOptions)) {
-        validFilters += 1;
-      }
-      continue;
-    }
-
-    throw new Error(
-      `Custom filter validator is not implemented for: '${filter.name}'`
-    );
   }
 
   const requireAllFilters = featureFlag.conditions.requirement_type === "All";
@@ -91,5 +57,39 @@ export function validateFeatureFlag(
   if (requireAllFilters) {
     return validFilters === filters.length;
   }
+
   return validFilters > 0;
+}
+
+function validateClientFilter(
+  filter: FeatureFlagClientFilter,
+  options: FeatureFlagValidateOptions = {},
+  featureFlag: FeatureFlag
+): boolean {
+  if (checkIsTimeWindowClientFilter(filter)) {
+    return validateFeatureFlagTimeWindowFilter(filter);
+  }
+
+  const filterOptions: FeatureFlagCustomFilterValidatorOptions = {
+    groups: options.groups ?? [],
+    key: featureFlag.id,
+    users: options.users ?? [],
+  };
+
+  if (checkIsTargetingClientFilter(filter)) {
+    return validateFeatureFlagTargetingFilter(
+      filter,
+      filterOptions,
+      options.handleRollout
+    );
+  }
+
+  const customFilterValidator = options.customFilterValidators?.[filter.name];
+  if (customFilterValidator) {
+    return customFilterValidator(filter, filterOptions);
+  }
+
+  throw new Error(
+    `Custom filter validator is not implemented for: '${filter.name}'`
+  );
 }

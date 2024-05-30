@@ -71,7 +71,7 @@ export async function getFeatureFlagByKey(
   try {
     const setting = await client.getConfigurationSetting({ key, label });
 
-    return (parseFeatureFlag(setting).value as FeatureFlag) ?? null;
+    return parseFeatureFlag(setting).value as FeatureFlag;
   } catch (error) {
     return null;
   }

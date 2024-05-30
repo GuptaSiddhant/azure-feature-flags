@@ -8,7 +8,7 @@ import { validateFeatureFlag } from "../src/validate";
 
 vi.useFakeTimers();
 
-describe.concurrent("Without filters", () => {
+describe("Without filters", { concurrent: true }, () => {
   it("should return false for invalid feature flag", () => {
     expect(validateFeatureFlag(undefined)).false;
   });
@@ -34,7 +34,7 @@ describe.concurrent("Without filters", () => {
   });
 });
 
-describe.concurrent("Targeting filter", () => {
+describe("Targeting filter", { concurrent: true }, () => {
   const featureFlag: FeatureFlag = {
     id: "feature",
     enabled: true,
@@ -96,13 +96,16 @@ describe.concurrent("Targeting filter", () => {
       if (!groupName) return percentage > 50;
       return percentage > 75;
     };
+
     expect(validateFeatureFlag(featureFlag, { handleRollout })).false;
+
     expect(
       validateFeatureFlag(featureFlag, {
         groups: ["sv-se"],
         handleRollout,
       })
     ).false;
+
     expect(
       validateFeatureFlag(featureFlag, {
         groups: ["en-gb"],
@@ -117,8 +120,9 @@ describe.concurrent("Targeting filter", () => {
   });
 
   // This test should be at the end of block because it modifies the feature flag object
-  it.sequential(
+  it(
     "should return false if no options are provided and DefaultRollout = 0",
+    { sequential: true },
     () => {
       featureFlag.conditions.clientFilters![0].parameters[
         "Audience"
@@ -128,7 +132,7 @@ describe.concurrent("Targeting filter", () => {
   );
 });
 
-describe.concurrent("Time window filter", () => {
+describe("Time window filter", { concurrent: true }, () => {
   const featureFlag: FeatureFlag = {
     id: "feature",
     enabled: true,
@@ -187,7 +191,7 @@ describe.concurrent("Time window filter", () => {
   });
 });
 
-describe.concurrent("Custom filter", () => {
+describe("Custom filter", { concurrent: true }, () => {
   const customFilter = { name: "my-filter", parameters: { foo: "bar" } };
   const featureFlag: FeatureFlag = {
     id: "feature",
@@ -222,7 +226,7 @@ describe.concurrent("Custom filter", () => {
   });
 });
 
-describe.concurrent("Multiple filters (OR)", () => {
+describe("Multiple filters (OR)", { concurrent: true }, () => {
   const featureFlag: FeatureFlag = {
     id: "feature",
     enabled: true,
@@ -261,7 +265,7 @@ describe.concurrent("Multiple filters (OR)", () => {
   });
 });
 
-describe.concurrent("Multiple filters (AND)", () => {
+describe("Multiple filters (AND)", { concurrent: true }, () => {
   const featureFlag: FeatureFlag = {
     id: "feature",
     enabled: true,

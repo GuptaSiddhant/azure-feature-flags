@@ -1,5 +1,5 @@
 import {
-  AppConfigurationClient,
+  type AppConfigurationClient,
   featureFlagPrefix,
   parseFeatureFlag,
 } from "@azure/app-configuration";
@@ -20,7 +20,7 @@ export async function iterateAppConfigurationFeatureFlags(
   client: AppConfigurationClient,
   options: GetFeatureFlagsOptions = {},
   onFound: (flag: FeatureFlag) => void
-) {
+): Promise<void> {
   Object.assign(options, { keyFilter: `${featureFlagPrefix}*` });
   const iterator = client.listConfigurationSettings(options);
 
