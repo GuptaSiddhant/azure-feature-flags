@@ -10,15 +10,33 @@ import { sha1 } from "../utils/hash-sha-1.js";
  * @see https://spacecamp.launchdarkly.com/lesson-3/how-percentage-rollouts-work
  * @see https://github.com/launchdarkly/js-core/tree/main/packages/sdk/server-node
  */
-export const handleRolloutWithHash: FeatureFlagHandleRollout = (
-  key,
-  rolloutPercentage,
-  groupName = "default"
-) => {
-  const hashKey = `${key}-.-${groupName}`;
-  const hex = sha1(hashKey);
-  const hashVal = Number.parseInt(hex.substring(0, 15), 16);
-  const bucket = Math.round((hashVal / 0xfffffffffffffff) * 100);
+export const handleRolloutWithHash: FeatureFlagHandleRollout =
+  generateHandleRolloutWithHash();
 
-  return bucket > 100 - rolloutPercentage;
-};
+function generateHandleRolloutWithHash(): FeatureFlagHandleRollout {
+  const bucketMap = new Map<string, number>();
+
+  return function handleRolloutWithHash(
+    key,
+    rolloutPercentage,
+    groupName = "default"
+  ) {
+    if (rolloutPercentage === 100) {
+      return true;
+    }
+    if (rolloutPercentage === 0) {
+      return false;
+    }
+
+    const mapKey = `${key}-.-${groupName}`;
+    if (!bucketMap.has(mapKey)) {
+      const hex = sha1(mapKey);
+      const value = Number.parseInt(hex.substring(0, 15), 16);
+      const bucket = Math.round((value / 0xfffffffffffffff) * 100);
+      bucketMap.set(mapKey, bucket);
+    }
+
+    const bucket = bucketMap.get(mapKey)!;
+    return bucket > 100 - rolloutPercentage;
+  };
+}

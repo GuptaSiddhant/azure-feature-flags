@@ -3,6 +3,9 @@
 /**
  * @module
  * This module contains all the functions exported by the package.
+ *
+ * It is recommended to import functions from their respective modules
+ * for better tree-shaking and smaller bundle size.
  */
 
 export {

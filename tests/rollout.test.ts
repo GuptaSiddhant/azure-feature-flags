@@ -23,9 +23,18 @@ describe(handleRolloutWithHash, { concurrent: true }, () => {
   it("should return true if groupName: fi-fi, percentage: 1", () => {
     expect(handleRolloutWithHash(flagKey, 1, "fi-fi")).false;
   });
+
+  it("should return true if percentage: 100", () => {
+    expect(handleRolloutWithHash(flagKey, 100)).true;
+    expect(handleRolloutWithHash(flagKey, 100)).true;
+  });
+  it("should return false if percentage: 0", () => {
+    expect(handleRolloutWithHash(flagKey, 0)).false;
+    expect(handleRolloutWithHash(flagKey, 0)).false;
+  });
 });
 
-describe(handleRolloutWithIncrement, { concurrent: true }, () => {
+describe("handleRolloutWithIncrement", { concurrent: true }, () => {
   testIncrementRollout(0, [false], true);
   testIncrementRollout(10, [true, ...Array(9).fill(false)]);
   testIncrementRollout(25, [true, false, false, false]);

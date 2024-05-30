@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
     test: {
       coverage: { include: ["src"] },
       dir: "tests",
+      benchmark: {},
     },
   };
 });
