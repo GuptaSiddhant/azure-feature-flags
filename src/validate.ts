@@ -38,9 +38,7 @@ export function validateFeatureFlag(
     return false;
   }
 
-  const filters =
-    featureFlag.conditions.client_filters ??
-    featureFlag.conditions.clientFilters;
+  const filters = featureFlag.conditions.client_filters;
   if (!filters || filters.length === 0) {
     return featureFlag.enabled;
   }

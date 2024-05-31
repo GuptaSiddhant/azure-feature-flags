@@ -69,7 +69,9 @@ export function generateDummyClient(
   } as AppConfigurationClient;
 }
 
-function wrapFeatureFlagInSetting(flag: FeatureFlag): ConfigurationSetting {
+export function wrapFeatureFlagInSetting(
+  flag: FeatureFlag
+): ConfigurationSetting {
   return {
     key: `${featureFlagPrefix}${flag.id}`,
     isReadOnly: false,

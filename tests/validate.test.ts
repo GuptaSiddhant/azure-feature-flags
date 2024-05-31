@@ -39,7 +39,7 @@ describe("Targeting filter", { concurrent: true }, () => {
     id: "feature",
     enabled: true,
     conditions: {
-      clientFilters: [
+      client_filters: [
         {
           name: "Microsoft.Targeting",
           parameters: {
@@ -124,7 +124,7 @@ describe("Targeting filter", { concurrent: true }, () => {
     "should return false if no options are provided and DefaultRollout = 0",
     { sequential: true },
     () => {
-      featureFlag.conditions.clientFilters![0].parameters[
+      featureFlag.conditions.client_filters![0].parameters[
         "Audience"
       ].DefaultRolloutPercentage = 0;
       expect(validateFeatureFlag(featureFlag, {})).false;

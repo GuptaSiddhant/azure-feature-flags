@@ -13,7 +13,7 @@ const flagObject = {
   id: "testFlag",
   description: "",
   enabled: true,
-  conditions: { clientFilters: undefined },
+  conditions: { client_filters: undefined },
   displayName: undefined,
 };
 
@@ -111,10 +111,8 @@ describe(setFeatureFlag, { concurrent: true }, () => {
     expect(newFlag).toMatchInlineSnapshot(`
       {
         "conditions": {
-          "clientFilters": [],
+          "client_filters": [],
         },
-        "description": undefined,
-        "displayName": undefined,
         "enabled": true,
         "id": "feature",
       }
@@ -138,10 +136,8 @@ describe(setFeatureFlag, { concurrent: true }, () => {
       .toMatchInlineSnapshot(`
       {
         "conditions": {
-          "clientFilters": [],
+          "client_filters": [],
         },
-        "description": undefined,
-        "displayName": undefined,
         "enabled": false,
         "id": "feature",
       }

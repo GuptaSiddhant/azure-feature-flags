@@ -7,7 +7,6 @@ export type FeatureFlagsRecord = Record<string, FeatureFlag>;
  */
 export type FeatureFlag = {
   conditions: {
-    clientFilters?: Array<FeatureFlagClientFilter>;
     client_filters?: Array<FeatureFlagClientFilter>;
     requirement_type?: "All" | "Any";
   };

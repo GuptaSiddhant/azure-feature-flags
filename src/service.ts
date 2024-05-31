@@ -15,6 +15,7 @@ import type {
   ConfigurationSettingParam,
 } from "@azure/app-configuration";
 import {
+  extractFeatureFlagFromSetting,
   invariantAppConfigurationClient,
   iterateAppConfigurationFeatureFlags,
 } from "./utils/app-config.js";
@@ -71,7 +72,7 @@ export async function getFeatureFlagByKey(
   try {
     const setting = await client.getConfigurationSetting({ key, label });
 
-    return parseFeatureFlag(setting).value as FeatureFlag;
+    return extractFeatureFlagFromSetting(setting);
   } catch (error) {
     return null;
   }

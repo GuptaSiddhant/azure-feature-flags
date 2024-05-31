@@ -1,9 +1,9 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "Node",
-    "module": "CommonJS",
-    "outDir": "./cjs/",
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "outDir": "./esm/",
     "allowImportingTsExtensions": false,
     "noEmit": false
   },

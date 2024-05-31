@@ -2,8 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   invariantAppConfigurationClient,
   iterateAppConfigurationFeatureFlags,
+  extractFeatureFlagFromSetting,
 } from "../src/utils/app-config";
-import { dummyFeatureFlag, generateDummyClient } from "./azure-client.mock";
+import {
+  dummyFeatureFlag,
+  generateDummyClient,
+  wrapFeatureFlagInSetting,
+} from "./azure-client.mock";
 
 describe(invariantAppConfigurationClient, { concurrent: true }, () => {
   const errorMessage = `'client' is not valid Azure AppConfigurationClient`;
@@ -49,10 +54,8 @@ describe(iterateAppConfigurationFeatureFlags, { concurrent: true }, () => {
       [
         {
           "conditions": {
-            "clientFilters": [],
+            "client_filters": [],
           },
-          "description": undefined,
-          "displayName": undefined,
           "enabled": true,
           "id": "feature",
         },
@@ -71,10 +74,8 @@ describe(iterateAppConfigurationFeatureFlags, { concurrent: true }, () => {
       {
         "feature": {
           "conditions": {
-            "clientFilters": [],
+            "client_filters": [],
           },
-          "description": undefined,
-          "displayName": undefined,
           "enabled": true,
           "id": "feature",
         },
@@ -90,5 +91,34 @@ describe(iterateAppConfigurationFeatureFlags, { concurrent: true }, () => {
       list.push(flag);
     });
     expect(list).toMatchInlineSnapshot(`[]`);
+  });
+});
+
+describe(extractFeatureFlagFromSetting, { concurrent: true }, () => {
+  it("should extract flag", () => {
+    expect(
+      extractFeatureFlagFromSetting(wrapFeatureFlagInSetting(dummyFeatureFlag))
+    ).toMatchInlineSnapshot(`
+      {
+        "conditions": {
+          "client_filters": [],
+        },
+        "enabled": true,
+        "id": "feature",
+      }
+    `);
+  });
+
+  it("should throw error if setting is not flag", () => {
+    expect(() =>
+      extractFeatureFlagFromSetting({
+        key: `some-id`,
+        isReadOnly: false,
+        contentType: "application/json",
+        value: JSON.stringify({}),
+      })
+    ).toThrowError(
+      "Setting with key some-id is not a valid FeatureFlag, make sure to have the correct content-type and a valid non-null value."
+    );
   });
 });
