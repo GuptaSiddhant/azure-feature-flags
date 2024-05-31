@@ -2,11 +2,7 @@
 
 import "dotenv/config";
 import { AppConfigurationClient } from "@azure/app-configuration";
-import {
-  getFeatureFlagsList,
-  getFeatureFlagByKey,
-  getFeatureFlagsRecord,
-} from "../esm/service.js";
+import { getFeatureFlagsList, getFeatureFlagByKey } from "../esm/service.js";
 
 const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
 if (!connectionString)

@@ -765,6 +765,11 @@ __metadata:
     dotenv: "npm:^16.4.5"
     typescript: "npm:^5.4.0"
     vitest: "npm:^1.6.0"
+  peerDependencies:
+    "@azure/app-configuration": ^1
+  peerDependenciesMeta:
+    "@azure/app-configuration":
+      optional: false
   languageName: unknown
   linkType: soft
 

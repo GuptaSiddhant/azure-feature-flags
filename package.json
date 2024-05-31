@@ -40,21 +40,25 @@
     ".": {
       "types": "./esm/index.d.ts",
       "import": "./esm/index.js",
+      "module": "./esm/index.js",
       "require": "./cjs/index.js"
     },
     "./rollout": {
       "types": "./esm/rollout.d.ts",
       "import": "./esm/rollout.js",
+      "module": "./esm/rollout.js",
       "require": "./cjs/rollout.js"
     },
     "./service": {
       "types": "./esm/service.d.ts",
       "import": "./esm/service.js",
+      "module": "./esm/service.js",
       "require": "./cjs/service.js"
     },
     "./validate": {
       "types": "./esm/validate.d.ts",
       "import": "./esm/validate.js",
+      "module": "./esm/validate.js",
       "require": "./cjs/validate.js"
     }
   },
@@ -62,7 +66,7 @@
   "module": "./esm/index.js",
   "types": "./esm/index.d.ts",
   "scripts": {
-    "build": "yarn build:cjs & yarn build:esm",
+    "build": "yarn build:cjs & yarn build:esm & node ./scripts/gen-js.js",
     "build:cjs": "rm -rf cjs; tsc -p tsconfig.cjs.json",
     "build:esm": "rm -rf esm; tsc",
     "bump": "node ./scripts/bump.mjs",
@@ -72,15 +76,21 @@
     "test:server": "node ./scripts/run.mjs",
     "test:watch": "vitest --coverage"
   },
+  "packageManager": "yarn@4.1.1",
   "devDependencies": {
+    "@azure/app-configuration": "^1",
     "@types/node": "^20.0.0",
     "@vitest/coverage-v8": "^1.6.0",
     "dotenv": "^16.4.5",
     "typescript": "^5.4.0",
     "vitest": "^1.6.0"
   },
-  "packageManager": "yarn@4.1.1",
-  "dependencies": {
+  "peerDependencies": {
     "@azure/app-configuration": "^1"
+  },
+  "peerDependenciesMeta": {
+    "@azure/app-configuration": {
+      "optional": false
+    }
   }
 }

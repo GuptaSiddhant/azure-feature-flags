@@ -25,15 +25,15 @@ This package depends on `@azure/app-configuration` to generate the Azure `AppCon
 ## Install
 
 ```sh
-npm i azure-feature-flags
+npm i azure-feature-flags @azure/app-configuration
 ```
 
 ```sh
-yarn add azure-feature-flags
+yarn add azure-feature-flags @azure/app-configuration
 ```
 
 ```sh
-bun add azure-feature-flags
+bun add azure-feature-flags @azure/app-configuration
 ```
 
 ## Service API

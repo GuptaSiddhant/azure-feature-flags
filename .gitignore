@@ -29,3 +29,6 @@ public/sprite*
 
 *storybook.log
 .npmrc
+
+*.js
+*.d.ts
