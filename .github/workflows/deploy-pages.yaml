@@ -44,6 +44,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Test
+        run: yarn test
+
       - name: Build project
         run: yarn app:build
 
@@ -53,7 +56,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: "./dist/"
 
       - name: Deploy to GitHub Pages

@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
       dir: "tests",
       benchmark: {},
     },
-    base: process.env.CI ? "azure-feature-flags" : undefined,
+    base: process.env.CI ? "/azure-feature-flags" : undefined,
     plugins: [react() as any, tailwindcss()],
   };
 });

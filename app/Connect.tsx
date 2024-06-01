@@ -35,10 +35,7 @@ export default function Connect({
           rows={5}
           required
           helpText="The ConnectionString will not be saved anywhere and only used for your session in your device."
-          // TODO Remove
-          defaultValue={
-            "Endpoint=https://aff-lib.azconfig.io;Id=2j6P;Secret=4xroQGWScUlu51HTsvvnDDygJZXEfK79Wbc9UJWvEAPIQQJy41J9JQQJ99AEACfhMk5a4cxFAAACAZACnKE1"
-          }
+          defaultValue={import.meta.env["VITE_AZURE_CONNECTION_STRING"]}
         />
 
         <Button disabled={isLoading} className="justify-center">
