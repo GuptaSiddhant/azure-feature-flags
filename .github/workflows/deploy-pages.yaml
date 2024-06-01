@@ -42,7 +42,7 @@ jobs:
           cache: "yarn"
 
       - name: Install dependencies
-        uses: yarn install
+        run: yarn install
 
       - name: Build project
         run: yarn app:build
