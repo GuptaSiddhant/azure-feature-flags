@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import useAzureClientActionState from "./useAzureClientActionState.ts";
+import useAzureClientActionState from "./hooks/useAzureClientActionState.ts";
 import { AppConfigurationClient } from "@azure/app-configuration";
 import Connect from "./Connect.tsx";
 import App from "./App.tsx";
+import { AzureClientContext } from "./contexts.ts";
 
 function Main() {
   const [clientOrError, action, isSubmitting] = useAzureClientActionState();
@@ -12,7 +13,9 @@ function Main() {
   return (
     <>
       {clientOrError instanceof AppConfigurationClient ? (
-        <App disconnectAction={action} client={clientOrError} />
+        <AzureClientContext.Provider value={clientOrError}>
+          <App disconnectAction={action} />
+        </AzureClientContext.Provider>
       ) : (
         <Connect
           connectAction={action}

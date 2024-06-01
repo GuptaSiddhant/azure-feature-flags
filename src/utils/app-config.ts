@@ -52,5 +52,10 @@ export function extractFeatureFlagFromSetting(
     throw TypeError("Invalid Feature Flag");
   }
 
+  if (setting.key !== `${featureFlagPrefix}${json.id}`) {
+    json.id = setting.key.replace(featureFlagPrefix, "");
+    (json as any).displayName = json.id;
+  }
+
   return json as FeatureFlag;
 }

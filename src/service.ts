@@ -7,12 +7,12 @@
 import {
   featureFlagContentType,
   featureFlagPrefix,
-  parseFeatureFlag,
 } from "@azure/app-configuration";
 import type {
   AddConfigurationSettingParam,
   AppConfigurationClient,
   ConfigurationSettingParam,
+  GetConfigurationSettingOptions,
 } from "@azure/app-configuration";
 import {
   extractFeatureFlagFromSetting,
@@ -58,7 +58,7 @@ export async function getFeatureFlagsList(
 export async function getFeatureFlagByKey(
   client: AppConfigurationClient,
   key: string,
-  label?: string
+  options?: GetConfigurationSettingOptions & { label?: string }
 ): Promise<FeatureFlag | null> {
   invariantAppConfigurationClient(client, "getConfigurationSetting");
 
@@ -70,7 +70,10 @@ export async function getFeatureFlagByKey(
   }
 
   try {
-    const setting = await client.getConfigurationSetting({ key, label });
+    const setting = await client.getConfigurationSetting(
+      { key, label: options?.label },
+      options
+    );
 
     return extractFeatureFlagFromSetting(setting);
   } catch (error) {

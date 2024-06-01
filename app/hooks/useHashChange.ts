@@ -1,19 +1,23 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
-export default function useHashChange(): string {
-  const [hash, setHash] = useState("");
+function subscribe(callback: () => void) {
+  callback();
 
-  useEffect(() => {
-    const handleChange = () => {
-      setHash(window.location.hash);
-    };
+  window.addEventListener("hashchange", callback);
 
-    window.addEventListener("hashchange", handleChange);
+  return () => {
+    window.removeEventListener("hashchange", callback);
+  };
+}
 
-    return () => {
-      window.removeEventListener("hashchange", handleChange);
-    };
-  });
+function getSnapshot() {
+  return window.location.hash.replace("#", "");
+}
 
-  return hash.replace("#", "");
+function getServerSnapshot() {
+  return undefined;
+}
+
+export default function useHashChange(): string | undefined {
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

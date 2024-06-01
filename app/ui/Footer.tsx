@@ -12,16 +12,38 @@ export default function Footer({
     >
       {children}
 
-      <div className="flex justify-between">
-        <span>© 2024 Siddhant Gupta</span>
-        <a
-          className="text-blue-500"
-          target="_blank"
-          href="https://github.com/guptasiddhant/azure-feature-flags"
-        >
-          GitHub
-        </a>
-      </div>
+      <ul className="flex gap-2 justify-between ">
+        <li>
+          <a
+            href="https://www.npmjs.com/package/azure-feature-flags"
+            target="_blank"
+          >
+            <img
+              alt="NPM Version"
+              src="https://img.shields.io/npm/v/azure-feature-flags"
+            />
+          </a>
+        </li>
+        <li>
+          <a
+            className="text-blue-500"
+            target="_blank"
+            href="https://github.com/guptasiddhant/azure-feature-flags"
+          >
+            GitHub
+          </a>
+        </li>
+        <li>
+          <a href="https://jsr.io/@gs/azure-feature-flags" target="_blank">
+            <img
+              src="https://jsr.io/badges/@gs/azure-feature-flags"
+              alt="Azure Feature Flags on JSR"
+            />
+          </a>
+        </li>
+      </ul>
+
+      <span>© 2024 Siddhant Gupta</span>
     </Card>
   );
 }

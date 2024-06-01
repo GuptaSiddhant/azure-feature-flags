@@ -1,47 +1,37 @@
-import { AppConfigurationClient } from "@azure/app-configuration";
 import { useReducer } from "react";
 import Button from "./ui/Button";
 import Header from "./ui/Header";
 import Footer from "./ui/Footer";
-import Flag from "./Flag.tsx";
+import FlagPage from "./FlagPage/index.tsx";
 import SideBar from "./Sidebar.tsx";
+import { useFeatureFlags } from "./hooks/useFeatureFlag.ts";
+import { RerenderAppContext } from "./contexts.ts";
 
-export default function App(props: {
-  client: AppConfigurationClient;
+export default function App({
+  disconnectAction,
+}: {
   disconnectAction: (data: FormData) => void;
 }) {
-  const [, rerender] = useReducer((prev) => prev + 1, 0);
+  const [seed, refresh] = useReducer((prev) => prev + 1, 0);
+  const featureFlags = useFeatureFlags(seed);
 
   return (
-    <div className="flex flex-col md:grid md:grid-cols-[300px_1fr] md:grid-rows-[max-content_1fr_max-content] gap-4 justify-center md:h-screen w-screen p-4">
-      <Header>
-        <Actions refresh={rerender} />
-      </Header>
+    <RerenderAppContext.Provider value={refresh}>
+      <div className="flex flex-col md:grid md:grid-cols-[300px_1fr] md:grid-rows-[max-content_1fr_max-content] gap-4 justify-center md:h-screen w-screen p-4">
+        <Header />
 
-      <SideBar client={props.client} />
+        <SideBar featureFlags={featureFlags} />
 
-      <Flag />
+        <FlagPage />
 
-      <Footer className="col-[1]">
-        <form action={props.disconnectAction} className="flex">
-          <Button className="text-red-500 w-full justify-center">
-            Disconnect from Azure
-          </Button>
-        </form>
-      </Footer>
-    </div>
-  );
-}
-
-function Actions({ refresh }: { refresh: () => void }) {
-  return (
-    <div className="flex gap-2 justify-between">
-      <a className="cursor-pointer" href="#+new">
-        + Add new
-      </a>
-      <button type="button" className="cursor-pointer" onClick={refresh}>
-        Refresh
-      </button>
-    </div>
+        <Footer className="col-[1]">
+          <form action={disconnectAction} className="flex">
+            <Button className="text-red-500 w-full justify-center">
+              Disconnect from Azure
+            </Button>
+          </form>
+        </Footer>
+      </div>
+    </RerenderAppContext.Provider>
   );
 }
