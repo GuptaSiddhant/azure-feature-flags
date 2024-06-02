@@ -9,9 +9,9 @@ export default function Header({
     <Card as="header" className={clsx(className)}>
       <div className="flex flex-wrap gap-x-4 gap-y-2 items-center justify-between">
         <span className="font-bold ">Azure Feature Flags</span>
-      </div>
 
-      {children}
+        {children}
+      </div>
     </Card>
   );
 }

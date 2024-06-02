@@ -2,26 +2,43 @@ import useHashChange from "../hooks/useHashChange";
 import Card from "../ui/Card";
 import { useFeatureFlag } from "../hooks/useFeatureFlag";
 import { useReducer } from "react";
-import { deleteFeatureFlag } from "../../src";
-import { NEW_FLAG_HASH } from "../constants";
-import { useAzureClientContext, useRerenderAppContext } from "../contexts";
+import {
+  checkIsFeatureFlagWithFilters,
+  checkIsFeatureFlagWithVariants,
+} from "../../src/validate";
+import { FilterFlagFooter, FilterFlagHeader } from "./FilterFlag";
+import { VariantFlagFooter, VariantFlagHeader } from "./VariantFlag";
 
 export default function FlagPage() {
   const flagId = useHashChange();
   const [seed, refresh] = useReducer((prev) => prev + 1, 0);
   const featureFlag = useFeatureFlag(flagId, seed);
-  const isNew = flagId === NEW_FLAG_HASH;
+
+  if (!featureFlag) {
+    return (
+      <Card className="md:row-[1_/_-1] md:col-[2]">
+        <p className="font-bold">No flag selected</p>
+        <p>Select a feature flag from the sidebar.</p>
+      </Card>
+    );
+  }
+
+  const isFilterFlag = checkIsFeatureFlagWithFilters(featureFlag);
+  const isVariantFlag = checkIsFeatureFlagWithVariants(featureFlag);
 
   return (
     <>
       <Card className="md:row-[1] md:col-[2] flex-row justify-between">
-        <span className="font-bold">
-          {isNew ? "New Feature Flag" : flagId || "No flag selected"}
-        </span>
+        {isFilterFlag ? (
+          <FilterFlagHeader featureFlag={featureFlag} />
+        ) : isVariantFlag ? (
+          <VariantFlagHeader featureFlag={featureFlag} />
+        ) : (
+          <span>[Unknown] {flagId}</span>
+        )}
 
-        {!flagId || isNew ? null : (
+        {!flagId ? null : (
           <div className="flex gap-4 justify-end">
-            <DeleteButton flagId={flagId} />
             <button type="button" className="cursor-pointer" onClick={refresh}>
               Refresh
             </button>
@@ -29,43 +46,23 @@ export default function FlagPage() {
         )}
       </Card>
 
-      {/* <Card className="flex-1 md:row-[2] md:col-[2] h-full overflow-y-scroll">
-        <pre>{JSON.stringify(featureFlag, null, 2)}</pre>
-      </Card> */}
-
-      <Card className="md:row-[2_/_-1] md:col-[2] h-full overflow-y-scroll">
+      <Card className="md:row-[2] md:col-[2] h-full overflow-y-scroll">
         {featureFlag ? (
-          <pre className="overflow-y-scroll text-sm">
-            {JSON.stringify(featureFlag, null, 2)}
-          </pre>
+          <pre className="text-sm">{JSON.stringify(featureFlag, null, 2)}</pre>
         ) : (
           <span className="text-gray-500">
             JSON representation of the Feature Flag
           </span>
         )}
       </Card>
+
+      <Card className="md:row-[3] md:col-[2] justify-center">
+        {isFilterFlag ? (
+          <FilterFlagFooter featureFlag={featureFlag} />
+        ) : isVariantFlag ? (
+          <VariantFlagFooter featureFlag={featureFlag} />
+        ) : null}
+      </Card>
     </>
-  );
-}
-
-function DeleteButton({ flagId }: { flagId: string }) {
-  const client = useAzureClientContext();
-  const refreshApp = useRerenderAppContext();
-
-  return (
-    <button
-      type="button"
-      className="cursor-pointer text-red-500"
-      onClick={() => {
-        if (confirm(`Are you sure to delete Feature Flag '${flagId}'?`)) {
-          deleteFeatureFlag(client, flagId).then(() => {
-            window.location.hash = "";
-            refreshApp();
-          });
-        }
-      }}
-    >
-      - Delete
-    </button>
   );
 }

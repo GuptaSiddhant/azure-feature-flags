@@ -4,7 +4,7 @@ import type {
   FeatureFlagClientFilter,
   FeatureFlagHandleRollout,
 } from "../src/types";
-import validateFeatureFlagWithFilters from "../src/validators/validate-filters";
+import { validateFeatureFlagWithFilters } from "../src/validators/validate-filters";
 
 vi.useFakeTimers();
 

@@ -15,6 +15,18 @@ export default function Footer({
       <ul className="flex gap-2 justify-between ">
         <li>
           <a
+            className="text-blue-500"
+            target="_blank"
+            href="https://github.com/guptasiddhant/azure-feature-flags"
+          >
+            <img
+              alt="GitHub Tag"
+              src="https://img.shields.io/github/v/tag/GuptaSiddhant/azure-feature-flags?label=GitHub"
+            />
+          </a>
+        </li>
+        <li>
+          <a
             href="https://www.npmjs.com/package/azure-feature-flags"
             target="_blank"
           >
@@ -22,15 +34,6 @@ export default function Footer({
               alt="NPM Version"
               src="https://img.shields.io/npm/v/azure-feature-flags"
             />
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-500"
-            target="_blank"
-            href="https://github.com/guptasiddhant/azure-feature-flags"
-          >
-            GitHub
           </a>
         </li>
         <li>

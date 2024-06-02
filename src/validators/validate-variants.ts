@@ -1,8 +1,15 @@
 import type {
+  FeatureFlag,
   FeatureFlagVariant,
   FeatureFlagWithVariants,
   FeatureFlagWithVariantsValidateOptions,
 } from "../types";
+
+export function checkIsFeatureFlagWithVariants(
+  featureFlag: FeatureFlag
+): featureFlag is FeatureFlagWithVariants {
+  return "variants" in featureFlag;
+}
 
 /**
  * Validate the feature-flag object with variants and allocations.
@@ -12,7 +19,7 @@ import type {
  * @returns the allocated variant
  * @throws if feature flag is invalid or does not
  */
-export default function validateFeatureFlagWithVariants(
+export function validateFeatureFlagWithVariants(
   featureFlag: FeatureFlagWithVariants,
   options?: FeatureFlagWithVariantsValidateOptions
 ): FeatureFlagVariant {

@@ -10,14 +10,20 @@ import type {
   FeatureFlag,
   FeatureFlagWithFiltersValidateOptions,
 } from "./types.js";
-import validateFeatureFlagWithFilters from "./validators/validate-filters.js";
+import { validateFeatureFlagWithFilters } from "./validators/validate-filters.js";
 
 export type {
-  FeatureFlagWithFiltersValidateOptions as FeatureFlagValidateOptions,
   FeatureFlag,
+  FeatureFlagWithFiltersValidateOptions,
 } from "./types.ts";
-export { default as validateFeatureFlagWithFilters } from "./validators/validate-filters.js";
-export { default as validateFeatureFlagWithVariants } from "./validators/validate-variants.js";
+export {
+  checkIsFeatureFlagWithFilters,
+  validateFeatureFlagWithFilters,
+} from "./validators/validate-filters.js";
+export {
+  checkIsFeatureFlagWithVariants,
+  validateFeatureFlagWithVariants,
+} from "./validators/validate-variants.js";
 
 /**
  * Validate the feature-flag object with filters and rollout.

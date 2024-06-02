@@ -14,6 +14,12 @@ import {
   validateFeatureFlagTimeWindowFilter,
 } from "./validate-filter-time-window";
 
+export function checkIsFeatureFlagWithFilters(
+  featureFlag: FeatureFlag
+): featureFlag is FeatureFlagWithFilters {
+  return "conditions" in featureFlag;
+}
+
 /**
  * Validate the feature-flag object with filters and rollout.
  *
@@ -22,7 +28,7 @@ import {
  * @returns if the feature flag should be enabled or not with given filters
  * @throws when a validator is not implemented to handle a custom filter.
  */
-export default function validateFeatureFlagWithFilters(
+export function validateFeatureFlagWithFilters(
   featureFlag: FeatureFlagWithFilters | undefined | null,
   options?: FeatureFlagWithFiltersValidateOptions
 ): boolean {

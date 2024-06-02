@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { FeatureFlagWithVariants } from "../src/types";
-import validateFeatureFlagWithVariants from "../src/validators/validate-variants";
+import { validateFeatureFlagWithVariants } from "../src/validators/validate-variants";
 
 describe("Without filters", { concurrent: true }, () => {
   it("should return false for invalid feature flag", () => {

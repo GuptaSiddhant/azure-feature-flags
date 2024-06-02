@@ -18,7 +18,11 @@ export default function App({
   return (
     <RerenderAppContext.Provider value={refresh}>
       <div className="flex flex-col md:grid md:grid-cols-[300px_1fr] md:grid-rows-[max-content_1fr_max-content] gap-4 justify-center md:h-screen w-screen p-4">
-        <Header />
+        <Header>
+          <button type="button" className="cursor-pointer" onClick={refresh}>
+            Refresh
+          </button>
+        </Header>
 
         <SideBar featureFlags={featureFlags} />
 
