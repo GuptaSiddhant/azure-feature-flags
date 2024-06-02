@@ -3,8 +3,10 @@ import type { FeatureFlagHandleRollout } from "../types.js";
 /**
  * Handle rollout using controlled increment.
  */
-export const handleRolloutWithIncrement: FeatureFlagHandleRollout =
+const handleRolloutWithIncrement: FeatureFlagHandleRollout =
   generateHandleRolloutWithIncrement();
+
+export default handleRolloutWithIncrement;
 
 function generateHandleRolloutWithIncrement(): FeatureFlagHandleRollout {
   const infoMap = new Map<string, { ratio: number; total: number }>();

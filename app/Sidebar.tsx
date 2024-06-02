@@ -41,8 +41,7 @@ export default function SideBar({
                 )}
               />
               <span>
-                [{"conditions" in flag ? "C" : "V"}]{" "}
-                {flag.displayName ?? flag.id}
+                [{"variants" in flag ? "V" : "F"}] {flag.displayName ?? flag.id}
               </span>
             </Link>
           </li>

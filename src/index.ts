@@ -29,7 +29,7 @@ export type {
   FeatureFlagCustomFilter,
   FeatureFlagCustomFilterValidator,
   FeatureFlagCustomFilterValidators,
-  FeatureFlagValidateOptions,
+  FeatureFlagWithFiltersValidateOptions as FeatureFlagValidateOptions,
   FeatureFlagClientFilter,
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlagHandleRollout,

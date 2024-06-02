@@ -13,13 +13,14 @@ This package depends on `@azure/app-configuration` to generate the Azure `AppCon
   - [getFeatureFlagByKey](#getFeatureFlagByKey)
   - [setFeatureFlag](#setFeatureFlag)
   - [deleteFeatureFlag](#deleteFeatureFlag)
-- [Validation API (`validateFeatureFlag`)](#validation-api)
-  - [Default and TimeWindow filter](#default-and-timewindow-filter)
-  - [Targeting filter](#targeting-filter)
-    - [Handle rollout](#handle-rollout)
-      - [Built-in handlers](#built-in-handlers)
-      - [Custom handler](#custom-handler)
-  - [Custom filter](#custom-filter)
+- [Validation API](#validation-api)
+  - [`validateFeatureFlagWithFilters`](#validatefeatureflagwithfilters)
+    - [Default and TimeWindow filter](#default-and-timewindow-filter)
+    - [Targeting filter](#targeting-filter)
+      - [Handle rollout](#handle-rollout)
+        - [Built-in handlers](#built-in-handlers)
+        - [Custom handler](#custom-handler)
+    - [Custom filter](#custom-filter)
 - [License](#license)
 
 ## Install
@@ -118,40 +119,42 @@ const deleted: boolean = await deleteFeatureFlag(client, featureFlagKey);
 
 ## Validation API
 
-**`validateFeatureFlag`**: Validate a feature-flag object against filters/conditions.
+### `validateFeatureFlagWithFilters`
+
+Validate a feature-flag object against filters/conditions.
 
 > Note: The function will `throw` if a custom filter is encountered without a validator. Hence, it is recommended to wrap the function call in try-catch for handling unsupported custom filters.
 
 > Note, all exports can be imported from root package `azure-feature-flags` but for sake of tree-shaking, they are made available from `azure-feature-flags/validate`
 
-### Default and TimeWindow filter
+#### Default and TimeWindow filter
 
 If filters are not set on the flag, the validation returns the value set in `featureFlag.enabled`. Otherwise, the `TimeWindow` filter is also tested against current time.
 
 ```ts
-import { validateFeatureFlag } from "azure-feature-flags/validate";
+import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
 
-const isValid: boolean = validateFeatureFlag(featureFlag);
+const isValid: boolean = validateFeatureFlagWithFilters(featureFlag);
 ```
 
-### Targeting filter
+#### Targeting filter
 
 When a group(s) or user(s) are provided, the value is matched against the targeted audiences (both included and excluded) set in the Azure App Config.
 
 ```ts
-import { validateFeatureFlag } from "azure-feature-flags/validate";
+import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
 
-const isValid: boolean = validateFeatureFlag(featureFlag, {
+const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
   groups: ["editor"],
   users: ["user-id"],
 });
 ```
 
-#### Handle rollout
+##### Handle rollout
 
 > Note: By default, any rollout percentage set to `> 0` is considered valid. This behaviour can be overridden by providing a custom `handleRollout` callback in the options.
 
-##### Built-in handlers
+###### Built-in handlers
 
 The package exports some rollout handlers which can be used instead of creating your own.
 
@@ -164,10 +167,10 @@ The package exports some rollout handlers which can be used instead of creating 
   For a 75% rollout, first 3 runs will be true and then a false, and then repeat.
 
   ```ts
-  import { validateFeatureFlag } from "azure-feature-flags/validate";
+  import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
   import { handleRolloutWithIncrement } from "azure-feature-flags/rollout";
 
-  const isValid: boolean = validateFeatureFlag(featureFlag, {
+  const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
     groups: ["editor"],
     handleRollout: handleRolloutWithIncrement,
   });
@@ -179,19 +182,19 @@ The package exports some rollout handlers which can be used instead of creating 
   That hash is converted to a number and compare with rolloutPercentage
 
   ```ts
-  import { validateFeatureFlag } from "azure-feature-flags/validate";
+  import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
   import { handleRolloutWithHash } from "azure-feature-flags/rollout";
 
-  const isValid: boolean = validateFeatureFlag(featureFlag, {
+  const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
     groups: ["editor"],
     handleRollout: handleRolloutWithHash,
   });
   ```
 
-##### Custom handler
+###### Custom handler
 
 ```ts
-import { validateFeatureFlag } from "azure-feature-flags/validate";
+import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
 import type { FeatureFlagHandleRollout } from "azure-feature-flags";
 
 const handleRollout: FeatureFlagHandleRollout = (
@@ -203,20 +206,20 @@ const handleRollout: FeatureFlagHandleRollout = (
   return groupName === "editor" && rolloutPercentage > Math.random() * 100;
 };
 
-const isValid: boolean = validateFeatureFlag(featureFlag, {
+const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
   groups: ["editor"],
   handleRollout,
 });
 ```
 
-### Custom filter
+#### Custom filter
 
 Azure allows for custom filters and they need to be manually tested against. The function accepts an object of custom filters to test against.
 
 The validator function received the `filter` object set in Azure Config as first argument, and groups & users are 2nd param.
 
 ```ts
-import { validateFeatureFlag } from "azure-feature-flags/validate";
+import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
 import type { FeatureFlagCustomFilterValidator } from "azure-feature-flags";
 
 const myFilterValidator: FeatureFlagCustomFilterValidator = (
@@ -229,9 +232,19 @@ const myFilterValidator: FeatureFlagCustomFilterValidator = (
   );
 };
 
-const isValid: boolean = validateFeatureFlag(featureFlag, {
+const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
   customFilterValidators: { "my-filter-name": myFilterValidator },
 });
+```
+
+### `validateFeatureFlagWithVariants`
+
+> This API is experimental and may change as the Variants feature of Azure App Configuration Feature Manager is under Preview.
+
+```ts
+import { validateFeatureFlagWithVariants } from "azure-feature-flags/validate";
+
+const variant = validateFeatureFlagWithVariants(featureFlag);
 ```
 
 ## License

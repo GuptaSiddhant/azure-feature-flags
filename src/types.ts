@@ -5,15 +5,57 @@ export type FeatureFlagsRecord = Record<string, FeatureFlag>;
 /**
  * Feature Flag based Azure App configuration.
  */
-export type FeatureFlag = {
-  conditions: {
-    client_filters?: Array<FeatureFlagClientFilter>;
-    requirement_type?: "All" | "Any";
-  };
+export type FeatureFlag = FeatureFlagWithFilters | FeatureFlagWithVariants;
+
+export type FeatureFlagWithFilters = {
   description?: string;
   displayName?: string;
   enabled: boolean;
   id: string;
+  conditions: {
+    client_filters?: Array<FeatureFlagClientFilter>;
+    requirement_type?: "All" | "Any";
+  };
+};
+
+export type FeatureFlagWithVariants = {
+  description?: string;
+  displayName?: string;
+  enabled: boolean;
+  id: string;
+  allocation: FeatureFlagAllocation;
+  variants: Array<FeatureFlagVariant>;
+  telemetry?: { enabled: boolean };
+};
+
+export type FeatureFlagVariant = {
+  name: string;
+  configuration_value: JsonValue;
+};
+
+export type FeatureFlagAllocation = {
+  percentile: Array<FeatureFlagAllocationPercentile>;
+  group?: Array<FeatureFlagAllocationGroup>;
+  user?: Array<FeatureFlagAllocationUser>;
+  seed?: number;
+  default_when_enabled: string;
+  default_when_disabled: string;
+};
+
+export type FeatureFlagAllocationPercentile = {
+  variant: string;
+  from: number;
+  to: number;
+};
+
+export type FeatureFlagAllocationGroup = {
+  variant: string;
+  groups: Array<string>;
+};
+
+export type FeatureFlagAllocationUser = {
+  variant: string;
+  users: Array<string>;
 };
 
 /**
@@ -84,9 +126,9 @@ export type FeatureFlagCustomFilterValidators = Record<
 >;
 
 /**
- * Options for validating a Feature flag.
+ * Options for validating a Feature flag with filters.
  */
-export type FeatureFlagValidateOptions = {
+export type FeatureFlagWithFiltersValidateOptions = {
   /** Groups to validate the feature flag against */
   groups?: Array<string>;
   /** User ID to validate the feature flag against */
@@ -113,3 +155,21 @@ export type GetFeatureFlagsOptions = Omit<
   ListConfigurationSettingsOptions,
   "keyFilter"
 >;
+
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Array<JsonValue>
+  | { [key: string]: JsonValue };
+
+/**
+ * Options for validating a Feature flag with variants.
+ */
+export type FeatureFlagWithVariantsValidateOptions = {
+  /** Groups to validate the feature flag against */
+  groups?: Array<string>;
+  /** User ID to validate the feature flag against */
+  users?: Array<string>;
+};
