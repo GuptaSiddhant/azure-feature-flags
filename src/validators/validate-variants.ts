@@ -1,5 +1,6 @@
 import type {
   FeatureFlag,
+  FeatureFlagAllocationPercentile,
   FeatureFlagVariant,
   FeatureFlagWithVariants,
   FeatureFlagWithVariantsValidateOptions,
@@ -65,6 +66,28 @@ export function validateFeatureFlagWithVariants(
     }
   }
 
+  // Allocate based on percentile
+  if (allocation.percentile && allocation.percentile.length > 0) {
+    verifyAllocationPercentile(allocation.percentile);
+
+    const handleAllocate =
+      options?.handleAllocate ??
+      ((ps: FeatureFlagAllocationPercentile[]) => {
+        let current: { variant: string; gap: number } | undefined = undefined;
+        for (const p of ps) {
+          const gap = p.to - p.from;
+          if (!current || gap > current.gap) {
+            current = { variant: p.variant, gap };
+          }
+        }
+        return current!.variant;
+      });
+
+    const variantName = handleAllocate(allocation.percentile, allocation.seed);
+
+    return getVariantFromVariantMap(variantMap, variantName);
+  }
+
   return getVariantFromVariantMap(variantMap, allocation.default_when_enabled);
 }
 
@@ -82,9 +105,25 @@ function getVariantFromVariantMap(
   return variant;
 }
 
-/**
+function verifyAllocationPercentile(
+  percentiles: FeatureFlagAllocationPercentile[]
+): void {
+  // Make sure allocations add up to 100
+  let previewTo = 0;
+  for (const percentile of percentiles) {
+    if (percentile.from !== previewTo) {
+      throw new RangeError(
+        "'From' value of allocation should match 'To' value of previous allocation."
+      );
+    }
+    previewTo = percentile.to;
+  }
+  if (previewTo !== 100) {
+    throw new RangeError("All allocations do not add up to a complete 100%.");
+  }
+}
 
-  "allocation": {
+/**
     "percentile": [
       {
         "variant": "Off",
@@ -102,8 +141,4 @@ function getVariantFromVariantMap(
         "to": 100
       }
     ],
-
-    "default_when_enabled": "Maybe",
-    "default_when_disabled": "Maybe"
-  },
  */

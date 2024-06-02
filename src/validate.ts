@@ -10,7 +10,11 @@ import type {
   FeatureFlag,
   FeatureFlagWithFiltersValidateOptions,
 } from "./types.js";
-import { validateFeatureFlagWithFilters } from "./validators/validate-filters.js";
+import { checkIsFeatureFlagWithVariants } from "./validate.ts";
+import {
+  checkIsFeatureFlagWithFilters,
+  validateFeatureFlagWithFilters,
+} from "./validators/validate-filters.js";
 
 export type {
   FeatureFlag,
@@ -46,11 +50,11 @@ export function validateFeatureFlag(
     return false;
   }
 
-  if ("conditions" in featureFlag) {
+  if (checkIsFeatureFlagWithFilters(featureFlag)) {
     return validateFeatureFlagWithFilters(featureFlag, options);
   }
 
-  if ("variants" in featureFlag) {
+  if (checkIsFeatureFlagWithVariants(featureFlag)) {
     throw new Error(
       "This validator does not support the Feature Flags with variants. Use 'validateFeatureFlagWithVariants' to validate them."
     );

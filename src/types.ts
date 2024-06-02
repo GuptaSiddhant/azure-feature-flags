@@ -172,4 +172,17 @@ export type FeatureFlagWithVariantsValidateOptions = {
   groups?: Array<string>;
   /** User ID to validate the feature flag against */
   users?: Array<string>;
+  /**
+   * Function to handle allocation.
+   * By default, it returns the variant with most allocation.
+   */
+  handleAllocate?: FeatureFlagHandleVariantAllocation;
 };
+
+/**
+ * Function type for defining a handler for variant allocation.
+ */
+export type FeatureFlagHandleVariantAllocation = (
+  percentiles: FeatureFlagAllocationPercentile[],
+  seed?: number
+) => string;
