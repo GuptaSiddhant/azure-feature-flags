@@ -1,6 +1,6 @@
 {
   "name": "@gs/azure-feature-flags",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "exports": {
     ".": "./src/index.ts",
     "./allocate": "./src/allocate.ts",
@@ -8,7 +8,9 @@
     "./service": "./src/service.ts",
     "./validate": "./src/validate.ts"
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts"
+  ],
   "exclude": [
     ".yarn",
     "scripts",
