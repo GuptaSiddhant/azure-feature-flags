@@ -1,6 +1,6 @@
 {
   "name": "@gs/azure-feature-flags",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "exports": {
     ".": "./src/index.ts",
     "./allocate": "./src/allocate.ts",
