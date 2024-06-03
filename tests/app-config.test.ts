@@ -6,6 +6,8 @@ import {
 } from "../src/utils/app-config";
 import {
   dummyFeatureFlag,
+  featureFlagContentType,
+  featureFlagPrefix,
   generateDummyClient,
   wrapFeatureFlagInSetting,
 } from "./azure-client.mock";
@@ -120,5 +122,29 @@ describe(extractFeatureFlagFromSetting, { concurrent: true }, () => {
     ).toThrowError(
       "Setting with key some-id is not a valid FeatureFlag, make sure to have the correct content-type and a valid non-null value."
     );
+  });
+
+  it("should replace displayName with id if key!=id", () => {
+    expect(
+      extractFeatureFlagFromSetting({
+        key: `${featureFlagPrefix}some-id`,
+        isReadOnly: false,
+        contentType: featureFlagContentType,
+        value: JSON.stringify({
+          id: "someid",
+          enabled: true,
+          conditions: { client_filters: [] },
+        }),
+      })
+    ).toMatchInlineSnapshot(`
+      {
+        "conditions": {
+          "client_filters": [],
+        },
+        "displayName": "someid",
+        "enabled": true,
+        "id": "some-id",
+      }
+    `);
   });
 });

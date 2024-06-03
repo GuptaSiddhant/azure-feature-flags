@@ -43,6 +43,12 @@
       "module": "./esm/index.js",
       "require": "./cjs/index.js"
     },
+    "./allocate": {
+      "types": "./esm/allocate.d.ts",
+      "import": "./esm/allocate.js",
+      "module": "./esm/allocate.js",
+      "require": "./cjs/allocate.js"
+    },
     "./rollout": {
       "types": "./esm/rollout.d.ts",
       "import": "./esm/rollout.js",

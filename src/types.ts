@@ -146,7 +146,7 @@ export type FeatureFlagWithFiltersValidateOptions = {
  * Function type for defining a handler for rollout mechanism.
  */
 export type FeatureFlagHandleRollout = (
-  flagKey: string,
+  flagId: string,
   rolloutPercentage: number,
   groupName?: string
 ) => boolean;
@@ -174,7 +174,7 @@ export type FeatureFlagWithVariantsValidateOptions = {
   users?: Array<string>;
   /**
    * Function to handle allocation.
-   * By default, it returns the variant with most allocation.
+   * By default, it uses increment-allocation
    */
   handleAllocate?: FeatureFlagHandleVariantAllocation;
 };
@@ -183,6 +183,7 @@ export type FeatureFlagWithVariantsValidateOptions = {
  * Function type for defining a handler for variant allocation.
  */
 export type FeatureFlagHandleVariantAllocation = (
+  flagId: string,
   percentiles: FeatureFlagAllocationPercentile[],
   seed?: number
 ) => string;

@@ -1,7 +1,9 @@
 # Azure Feature Flags
 
-**get and validate feature flags from Azure Configuration.**
+**Get/set and validate feature flags from Azure App Configuration.**
 
+[![GitHub](https://img.shields.io/github/v/tag/GuptaSiddhant/azure-feature-flags?label=GitHub)](https://github.com/guptasiddhant/azure-feature-flags)
+[![NPM](https://img.shields.io/npm/v/azure-feature-flags)](https://www.npmjs.com/package/azure-feature-flags)
 [![JSR](https://jsr.io/badges/@gs/azure-feature-flags)](https://jsr.io/badges/@gs/azure-feature-flags)
 
 This package depends on `@azure/app-configuration` to generate the Azure `AppConfigurationClient`.
@@ -14,13 +16,14 @@ This package depends on `@azure/app-configuration` to generate the Azure `AppCon
   - [setFeatureFlag](#setFeatureFlag)
   - [deleteFeatureFlag](#deleteFeatureFlag)
 - [Validation API](#validation-api)
-  - [`validateFeatureFlagWithFilters`](#validatefeatureflagwithfilters)
+  - [validateFeatureFlagWithFilters](#validatefeatureflagwithfilters)
     - [Default and TimeWindow filter](#default-and-timewindow-filter)
     - [Targeting filter](#targeting-filter)
       - [Handle rollout](#handle-rollout)
         - [Built-in handlers](#built-in-handlers)
         - [Custom handler](#custom-handler)
     - [Custom filter](#custom-filter)
+  - [validateFeatureFlagWithVariants](#validatefeatureflagwithvariants)
 - [License](#license)
 
 ## Install
@@ -244,6 +247,7 @@ const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
 ```ts
 import { validateFeatureFlagWithVariants } from "azure-feature-flags/validate";
 
+// featureFlag with variants. It will throw if the flag is of other type (filters)
 const variant = validateFeatureFlagWithVariants(featureFlag);
 ```
 

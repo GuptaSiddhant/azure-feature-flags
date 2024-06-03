@@ -4,9 +4,28 @@ import type {
   FeatureFlagClientFilter,
   FeatureFlagHandleRollout,
 } from "../src/types";
-import { validateFeatureFlagWithFilters } from "../src/validators/validate-filters";
+import {
+  checkIsFeatureFlagWithFilters,
+  validateFeatureFlagWithFilters,
+} from "../src/validators/validate-filters";
+import { dummyFeatureFlag } from "./azure-client.mock";
 
 vi.useFakeTimers();
+
+describe(checkIsFeatureFlagWithFilters, () => {
+  it("should return true if object has conditions", () => {
+    expect(checkIsFeatureFlagWithFilters(dummyFeatureFlag)).true;
+  });
+  it("should return false if object does not have conditions", () => {
+    expect(
+      // @ts-expect-error
+      checkIsFeatureFlagWithFilters({
+        id: "",
+        enabled: false,
+      })
+    ).false;
+  });
+});
 
 describe("Without filters", { concurrent: true }, () => {
   it("should return false for invalid feature flag", () => {

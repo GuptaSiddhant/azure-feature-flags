@@ -53,8 +53,8 @@ export function extractFeatureFlagFromSetting(
   }
 
   if (setting.key !== `${featureFlagPrefix}${json.id}`) {
-    json.id = setting.key.replace(featureFlagPrefix, "");
     (json as any).displayName = json.id;
+    json.id = setting.key.replace(featureFlagPrefix, "");
   }
 
   return json as FeatureFlag;

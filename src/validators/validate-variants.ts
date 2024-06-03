@@ -1,3 +1,4 @@
+import { handleAllocateWithIncrement } from "../allocate";
 import type {
   FeatureFlag,
   FeatureFlagAllocationPercentile,
@@ -71,19 +72,13 @@ export function validateFeatureFlagWithVariants(
     verifyAllocationPercentile(allocation.percentile);
 
     const handleAllocate =
-      options?.handleAllocate ??
-      ((ps: FeatureFlagAllocationPercentile[]) => {
-        let current: { variant: string; gap: number } | undefined = undefined;
-        for (const p of ps) {
-          const gap = p.to - p.from;
-          if (!current || gap > current.gap) {
-            current = { variant: p.variant, gap };
-          }
-        }
-        return current!.variant;
-      });
+      options?.handleAllocate ?? handleAllocateWithIncrement;
 
-    const variantName = handleAllocate(allocation.percentile, allocation.seed);
+    const variantName = handleAllocate(
+      featureFlag.id,
+      allocation.percentile,
+      allocation.seed
+    );
 
     return getVariantFromVariantMap(variantMap, variantName);
   }
@@ -91,7 +86,7 @@ export function validateFeatureFlagWithVariants(
   return getVariantFromVariantMap(variantMap, allocation.default_when_enabled);
 }
 
-function getVariantFromVariantMap(
+export function getVariantFromVariantMap(
   variantMap: Map<string, FeatureFlagVariant>,
   name: string
 ): FeatureFlagVariant {
@@ -105,7 +100,7 @@ function getVariantFromVariantMap(
   return variant;
 }
 
-function verifyAllocationPercentile(
+export function verifyAllocationPercentile(
   percentiles: FeatureFlagAllocationPercentile[]
 ): void {
   // Make sure allocations add up to 100
@@ -122,23 +117,3 @@ function verifyAllocationPercentile(
     throw new RangeError("All allocations do not add up to a complete 100%.");
   }
 }
-
-/**
-    "percentile": [
-      {
-        "variant": "Off",
-        "from": 0,
-        "to": 50
-      },
-      {
-        "variant": "On",
-        "from": 50,
-        "to": 90
-      },
-      {
-        "variant": "Maybe",
-        "from": 90,
-        "to": 100
-      }
-    ],
- */

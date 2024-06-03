@@ -1,12 +1,11 @@
 import type { FeatureFlagHandleRollout } from "../types.js";
+import { createRatioFromFraction } from "../utils/math.js";
 
 /**
  * Handle rollout using controlled increment.
  */
-const handleRolloutWithIncrement: FeatureFlagHandleRollout =
+export const handleRolloutWithIncrement: FeatureFlagHandleRollout =
   generateHandleRolloutWithIncrement();
-
-export default handleRolloutWithIncrement;
 
 function generateHandleRolloutWithIncrement(): FeatureFlagHandleRollout {
   const infoMap = new Map<string, { ratio: number; total: number }>();
@@ -26,7 +25,7 @@ function generateHandleRolloutWithIncrement(): FeatureFlagHandleRollout {
 
     const mapKey = `${key}-.-${groupName}-.-${rolloutPercentage}`;
     if (!infoMap.has(mapKey)) {
-      const result = createRatio(rolloutPercentage / 100);
+      const result = createRatioFromFraction(rolloutPercentage / 100);
       infoMap.set(mapKey, result);
     }
 
@@ -41,21 +40,4 @@ function generateHandleRolloutWithIncrement(): FeatureFlagHandleRollout {
 
     return count < ratio;
   };
-}
-
-function createRatio(fraction: number) {
-  const len = fraction.toString().length - 2;
-  const denominator = Math.pow(10, len);
-  const numerator = fraction * denominator;
-  const divisor = gcd(numerator, denominator);
-  const ratio = Math.floor(numerator / divisor);
-  const total = Math.floor(denominator / divisor);
-
-  return { ratio, total };
-}
-
-function gcd(a: number, b: number) {
-  if (b < 0.0000001) return a;
-
-  return gcd(b, a % b);
 }

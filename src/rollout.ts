@@ -5,5 +5,5 @@
  * for different groups by percentage.
  */
 
-export { default as handleRolloutWithHash } from "./rollout-handlers/hash-rollout.js";
-export { default as handleRolloutWithIncrement } from "./rollout-handlers/increment-rollout.js";
+export { handleRolloutWithHash } from "./handlers/hash-rollout.js";
+export { handleRolloutWithIncrement } from "./handlers/increment-rollout.js";

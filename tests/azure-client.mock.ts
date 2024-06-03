@@ -6,8 +6,13 @@ import type {
   GetConfigurationSettingResponse,
   SetConfigurationSettingResponse,
 } from "@azure/app-configuration";
-import { featureFlagPrefix } from "@azure/app-configuration";
+import {
+  featureFlagPrefix,
+  featureFlagContentType,
+} from "@azure/app-configuration";
 import { FeatureFlag } from "../src/types";
+
+export { featureFlagPrefix, featureFlagContentType };
 
 export const dummyFeatureFlag: FeatureFlag = {
   id: "feature",
@@ -75,7 +80,7 @@ export function wrapFeatureFlagInSetting(
   return {
     key: `${featureFlagPrefix}${flag.id}`,
     isReadOnly: false,
-    contentType: "application/vnd.microsoft.appconfig.ff+json;charset=utf-8",
+    contentType: featureFlagContentType,
     value: JSON.stringify(flag),
   };
 }

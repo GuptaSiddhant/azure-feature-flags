@@ -10,10 +10,8 @@ import { sha1 } from "../utils/hash-sha-1.js";
  * @see https://spacecamp.launchdarkly.com/lesson-3/how-percentage-rollouts-work
  * @see https://github.com/launchdarkly/js-core/tree/main/packages/sdk/server-node
  */
-const handleRolloutWithHash: FeatureFlagHandleRollout =
+export const handleRolloutWithHash: FeatureFlagHandleRollout =
   generateHandleRolloutWithHash();
-
-export default handleRolloutWithHash;
 
 function generateHandleRolloutWithHash(): FeatureFlagHandleRollout {
   const bucketMap = new Map<string, number>();

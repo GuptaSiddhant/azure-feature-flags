@@ -3,13 +3,12 @@
   "version": "0.8.1",
   "exports": {
     ".": "./src/index.ts",
+    "./allocate": "./src/allocate.ts",
     "./rollout": "./src/rollout.ts",
     "./service": "./src/service.ts",
     "./validate": "./src/validate.ts"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
     ".yarn",
     "scripts",

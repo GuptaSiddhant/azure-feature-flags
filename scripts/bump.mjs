@@ -7,6 +7,9 @@ const strategy = process.argv[2] || "patch";
 /** @type {import("node:child_process").ExecSyncOptions} */
 const options = { encoding: "utf-8", stdio: "inherit" };
 
+// Break on failed tests
+execSync(`yarn test`, options);
+
 execSync(`yarn version ${strategy}`, options);
 
 const cwd = process.cwd();
