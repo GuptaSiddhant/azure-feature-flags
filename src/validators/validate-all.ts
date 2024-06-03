@@ -9,7 +9,7 @@ import type {
 import {
   checkIsFeatureFlagWithVariants,
   validateFeatureFlagWithVariants,
-} from "./validate-variants.ts";
+} from "./validate-variants.js";
 import {
   checkIsFeatureFlagWithFilters,
   validateFeatureFlagWithFilters,

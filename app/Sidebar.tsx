@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import Card from "./ui/Card.tsx";
 import Link from "./ui/Link.tsx";
-import useHashChange from "./hooks/useHashChange.ts";
-import { FeatureFlag } from "../src/types.ts";
+import useHashChange from "./hooks/useHashChange";
+import type { FeatureFlag } from "../src/types";
 
 export default function SideBar({
   featureFlags,

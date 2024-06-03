@@ -11,7 +11,7 @@ export type {
   FeatureFlagVariant,
   FeatureFlagWithFiltersValidateOptions,
   FeatureFlagWithVariantsValidateOptions,
-} from "./types.ts";
+} from "./types.js";
 export { validateFeatureFlag } from "./validators/validate-all.js";
 export {
   checkIsFeatureFlagWithFilters,

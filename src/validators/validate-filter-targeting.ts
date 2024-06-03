@@ -1,4 +1,4 @@
-import { handleRolloutWithIncrement } from "../handlers/increment-rollout.ts";
+import { handleRolloutWithIncrement } from "../handlers/increment-rollout.js";
 import type {
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlagClientFilter,

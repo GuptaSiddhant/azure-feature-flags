@@ -2,10 +2,10 @@ import { useReducer } from "react";
 import Button from "./ui/Button";
 import Header from "./ui/Header";
 import Footer from "./ui/Footer";
-import FlagPage from "./FlagPage/index.tsx";
+import FlagPage from "./FlagPage";
 import SideBar from "./Sidebar.tsx";
-import { useFeatureFlags } from "./hooks/useFeatureFlag.ts";
-import { RerenderAppContext } from "./contexts.ts";
+import { useFeatureFlags } from "./hooks/useFeatureFlag";
+import { RerenderAppContext } from "./contexts";
 
 export default function App({
   disconnectAction,

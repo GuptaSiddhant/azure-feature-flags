@@ -1,11 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import useAzureClientActionState from "./hooks/useAzureClientActionState.ts";
+import useAzureClientActionState from "./hooks/useAzureClientActionState";
 import { AppConfigurationClient } from "@azure/app-configuration";
 import Connect from "./Connect.tsx";
 import App from "./App.tsx";
-import { AzureClientContext } from "./contexts.ts";
+import { AzureClientContext } from "./contexts";
 
 function Main() {
   const [clientOrError, action, isSubmitting] = useAzureClientActionState();

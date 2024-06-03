@@ -5,4 +5,4 @@
  * for different variants by percentile.
  */
 
-export { handleAllocateWithIncrement } from "./handlers/increment-allocate.ts";
+export { handleAllocateWithIncrement } from "./handlers/increment-allocate.js";

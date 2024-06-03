@@ -1,4 +1,4 @@
-import { handleAllocateWithIncrement } from "../handlers/increment-allocate.ts";
+import { handleAllocateWithIncrement } from "../handlers/increment-allocate.js";
 import type {
   FeatureFlag,
   FeatureFlagAllocationPercentile,
