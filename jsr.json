@@ -9,17 +9,18 @@
     "./types": "./src/types.ts",
     "./validate": "./src/validate.ts"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
+    ".github",
     ".yarn",
+    "app",
     "scripts",
     "tests",
     ".yarnrc.yml",
     "*.js",
     "*.d.ts",
-    "vitest.config.ts",
+    "*.html",
+    "vite.config.ts",
     "yarn.lock",
     "*.json"
   ]
