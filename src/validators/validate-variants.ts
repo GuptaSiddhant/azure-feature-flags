@@ -1,4 +1,4 @@
-import { handleAllocateWithIncrement } from "../allocate";
+import { handleAllocateWithIncrement } from "../handlers/increment-allocate.ts";
 import type {
   FeatureFlag,
   FeatureFlagAllocationPercentile,
@@ -7,6 +7,9 @@ import type {
   FeatureFlagWithVariantsValidateOptions,
 } from "../types";
 
+/**
+ * Check if the Feature flag is of type with-variants.
+ */
 export function checkIsFeatureFlagWithVariants(
   featureFlag: FeatureFlag
 ): featureFlag is FeatureFlagWithVariants {

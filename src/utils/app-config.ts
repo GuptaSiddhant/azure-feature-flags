@@ -1,10 +1,16 @@
 import {
   type AppConfigurationClient,
   type ConfigurationSetting,
+  type ListConfigurationSettingsOptions,
   featureFlagPrefix,
   isFeatureFlag,
 } from "@azure/app-configuration";
-import { FeatureFlag, GetFeatureFlagsOptions } from "../types.js";
+import type { FeatureFlag } from "../types.js";
+
+export type GetFeatureFlagsOptions = Omit<
+  ListConfigurationSettingsOptions,
+  "keyFilter"
+>;
 
 export function invariantAppConfigurationClient(
   client: unknown,

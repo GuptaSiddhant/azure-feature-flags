@@ -1,12 +1,22 @@
-import { ListConfigurationSettingsOptions } from "@azure/app-configuration";
+/**
+ * @module
+ * This module contains all the TypeScript types
+ */
 
+/**
+ * Record/object representation of all Feature Flags.
+ */
 export type FeatureFlagsRecord = Record<string, FeatureFlag>;
 
 /**
- * Feature Flag based Azure App configuration.
+ * Feature Flag based on Azure App configuration.
  */
 export type FeatureFlag = FeatureFlagWithFilters | FeatureFlagWithVariants;
 
+/**
+ * Feature Flag based on Azure App configuration.
+ * It only represents the Feature Flag configured with Client Filters.
+ */
 export type FeatureFlagWithFilters = {
   description?: string;
   displayName?: string;
@@ -18,6 +28,10 @@ export type FeatureFlagWithFilters = {
   };
 };
 
+/**
+ * Feature Flag based on Azure App configuration.
+ * It only represents the Feature Flag configured with Variants.
+ */
 export type FeatureFlagWithVariants = {
   description?: string;
   displayName?: string;
@@ -28,11 +42,18 @@ export type FeatureFlagWithVariants = {
   variants: Array<FeatureFlagVariant>;
 };
 
+/**
+ * Representation of Feature Flag Variant with name and value.
+ * The `configuration_value` can be any valid JSON value.
+ */
 export type FeatureFlagVariant = {
   name: string;
   configuration_value: JsonValue;
 };
 
+/**
+ * Representation of Feature Flag Allocation object
+ */
 export type FeatureFlagAllocation = {
   percentile: Array<FeatureFlagAllocationPercentile>;
   group?: Array<FeatureFlagAllocationGroup>;
@@ -42,17 +63,28 @@ export type FeatureFlagAllocation = {
   default_when_disabled: string;
 };
 
+/**
+ * Representation of Feature Flag Allocation Percentile object
+ */
 export type FeatureFlagAllocationPercentile = {
   variant: string;
   from: number;
   to: number;
 };
 
+/**
+ * Representation of Feature Flag Allocation Group.
+ * A variant can be allocated to a list of groups.
+ */
 export type FeatureFlagAllocationGroup = {
   variant: string;
   groups: Array<string>;
 };
 
+/**
+ * Representation of Feature Flag Allocation User.
+ * A variant can be allocated to a list of users.
+ */
 export type FeatureFlagAllocationUser = {
   variant: string;
   users: Array<string>;
@@ -151,11 +183,9 @@ export type FeatureFlagHandleRollout = (
   groupName?: string
 ) => boolean;
 
-export type GetFeatureFlagsOptions = Omit<
-  ListConfigurationSettingsOptions,
-  "keyFilter"
->;
-
+/**
+ * Representation of all valid JSON values.
+ */
 export type JsonValue =
   | string
   | number

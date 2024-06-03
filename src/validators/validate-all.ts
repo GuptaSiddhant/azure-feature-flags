@@ -16,20 +16,30 @@ import {
 } from "./validate-filters.js";
 
 /**
- * Validate the feature-flag object with filters and variations.
+ * Validate the feature-flag object with variants.
  *
  * @param featureFlag Azure Feature Flag config object
  * @param options Options for validation
- * @returns if the feature flag should be enabled with given filters and variants
+ * @returns the variant that is allocated for given allocations
  */
 export function validateFeatureFlag(
   featureFlag: FeatureFlagWithVariants,
   options?: FeatureFlagWithVariantsValidateOptions
 ): FeatureFlagVariant;
+
+/**
+ * Validate the feature-flag object with filters.
+ *
+ * @param featureFlag Azure Feature Flag config object
+ * @param options Options for validation
+ * @returns if the feature flag should be enabled with given filters
+ */
 export function validateFeatureFlag(
   featureFlag: FeatureFlagWithFilters | null | undefined,
   options?: FeatureFlagWithFiltersValidateOptions
 ): boolean;
+
+// implementation
 export function validateFeatureFlag(
   featureFlag: FeatureFlag | null | undefined,
   options?: FeatureFlagWithFiltersValidateOptions

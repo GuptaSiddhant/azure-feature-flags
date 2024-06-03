@@ -2,6 +2,8 @@
 
 **Get/set and validate feature flags from Azure App Configuration.**
 
+[View demo app](https://git.guptasiddhant.com/azure-feature-flags/): Use your own Azure App Configuration to see what Feature Flags are available and how they validate.
+
 [![GitHub](https://img.shields.io/github/v/tag/GuptaSiddhant/azure-feature-flags?label=GitHub)](https://github.com/guptasiddhant/azure-feature-flags)
 [![NPM](https://img.shields.io/npm/v/azure-feature-flags)](https://www.npmjs.com/package/azure-feature-flags)
 [![JSR](https://jsr.io/badges/@gs/azure-feature-flags)](https://jsr.io/badges/@gs/azure-feature-flags)
@@ -168,13 +170,13 @@ const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
 
 ##### Handle rollout
 
-> Note: By default, any rollout percentage set to `> 0` is considered valid. This behaviour can be overridden by providing a custom `handleRollout` callback in the options.
-
 ###### Built-in handlers
 
 The package exports some rollout handlers which can be used instead of creating your own.
 
 - `handleRolloutWithIncrement`
+
+  > Note: This handler is used by default.
 
   The numbers on incremented on both sides (true and false) according to their ratio
   until a limit has reached. Then the increments are reset and it begins again.
@@ -266,6 +268,8 @@ const variant = validateFeatureFlagWithVariants(featureFlag, {
   users: [],
 });
 ```
+
+The options accepts `handleAllocate` function to override the default allocation function. The default allocation function uses simple increments as per ratio between the allocation percentiles.
 
 ## License
 

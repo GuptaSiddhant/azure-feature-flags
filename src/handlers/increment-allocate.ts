@@ -2,7 +2,7 @@ import type { FeatureFlagHandleVariantAllocation } from "../types.js";
 import { addNumbers, createRatioWithMultipleNumbers } from "../utils/math.js";
 
 /**
- * Handle rollout using controlled increment.
+ * Handle allocation of variants using controlled increment.
  */
 export const handleAllocateWithIncrement: FeatureFlagHandleVariantAllocation =
   generateHandleAllocateWithIncrement();

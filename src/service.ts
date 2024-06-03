@@ -15,18 +15,19 @@ import type {
   GetConfigurationSettingOptions,
 } from "@azure/app-configuration";
 import {
+  type GetFeatureFlagsOptions,
   extractFeatureFlagFromSetting,
   invariantAppConfigurationClient,
   iterateAppConfigurationFeatureFlags,
 } from "./utils/app-config.js";
-import type {
-  FeatureFlag,
-  FeatureFlagsRecord,
-  GetFeatureFlagsOptions,
-} from "./types.js";
+import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
 
 // Getters
 
+/**
+ * Fetch all feature flags related settings from Azure App Configuration
+ * and parse them to a record/object.
+ */
 export async function getFeatureFlagsRecord(
   client: AppConfigurationClient,
   options: GetFeatureFlagsOptions = {}
@@ -41,6 +42,10 @@ export async function getFeatureFlagsRecord(
   return record;
 }
 
+/**
+ * Fetch all feature flags related settings from Azure App Configuration
+ * and parse them to a list/array.
+ */
 export async function getFeatureFlagsList(
   client: AppConfigurationClient,
   options: GetFeatureFlagsOptions = {}
@@ -55,6 +60,10 @@ export async function getFeatureFlagsList(
   return list;
 }
 
+/**
+ * Fetch single feature flag related setting from Azure App Configuration
+ * by its key/id and parse it.
+ */
 export async function getFeatureFlagByKey(
   client: AppConfigurationClient,
   key: string,
@@ -83,6 +92,10 @@ export async function getFeatureFlagByKey(
 
 // Setter
 
+/**
+ * Add new or update existing feature flags related settings
+ * to Azure App Configuration.
+ */
 export async function setFeatureFlag(
   client: AppConfigurationClient,
   featureFlag: FeatureFlag,
@@ -118,6 +131,10 @@ export async function setFeatureFlag(
 
 // Delete-er
 
+/**
+ * Delete existing feature flags related settings
+ * from Azure App Configuration.
+ */
 export async function deleteFeatureFlag(
   client: AppConfigurationClient,
   key: string,

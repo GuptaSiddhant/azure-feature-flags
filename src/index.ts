@@ -16,12 +16,11 @@ export {
   deleteFeatureFlag,
 } from "./service.js";
 
-export { validateFeatureFlag } from "./validate.js";
-
 export {
-  handleRolloutWithHash,
-  handleRolloutWithIncrement,
-} from "./rollout.js";
+  validateFeatureFlag,
+  validateFeatureFlagWithFilters,
+  validateFeatureFlagWithVariants,
+} from "./validate.js";
 
 export type {
   FeatureFlag,
@@ -29,10 +28,12 @@ export type {
   FeatureFlagCustomFilter,
   FeatureFlagCustomFilterValidator,
   FeatureFlagCustomFilterValidators,
-  FeatureFlagWithFiltersValidateOptions as FeatureFlagValidateOptions,
+  FeatureFlagWithFiltersValidateOptions,
   FeatureFlagClientFilter,
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlagHandleRollout,
   FeatureFlagTargetingFilter,
   FeatureFlagTimeWindowFilter,
+  FeatureFlagWithVariants,
+  FeatureFlagWithVariantsValidateOptions,
 } from "./types.js";

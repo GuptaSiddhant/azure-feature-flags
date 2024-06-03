@@ -1,3 +1,4 @@
+import { handleRolloutWithIncrement } from "../handlers/increment-rollout.ts";
 import type {
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlagClientFilter,
@@ -16,14 +17,10 @@ export function checkIsTargetingClientFilter(
   return typeof Audience === "object";
 }
 
-const defaultHandleRollout: FeatureFlagHandleRollout = (_, percentage) => {
-  return percentage > 0;
-};
-
 export function validateFeatureFlagTargetingFilter(
   filter: FeatureFlagTargetingFilter,
   options: FeatureFlagCustomFilterValidatorOptions,
-  handleRollout: FeatureFlagHandleRollout = defaultHandleRollout
+  handleRollout: FeatureFlagHandleRollout = handleRolloutWithIncrement
 ): boolean {
   // The options is currently tested against both included and excluded audiences.
   // In future, more options can be added which are tested against either audiences.

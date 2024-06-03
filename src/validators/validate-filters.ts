@@ -14,6 +14,9 @@ import {
   validateFeatureFlagTimeWindowFilter,
 } from "./validate-filter-time-window";
 
+/**
+ * Check if the Feature flag is of type with-filters.
+ */
 export function checkIsFeatureFlagWithFilters(
   featureFlag: FeatureFlag
 ): featureFlag is FeatureFlagWithFilters {
