@@ -24,8 +24,8 @@ export type FeatureFlagWithVariants = {
   enabled: boolean;
   id: string;
   allocation: FeatureFlagAllocation;
-  variants: Array<FeatureFlagVariant>;
   telemetry?: { enabled: boolean };
+  variants: Array<FeatureFlagVariant>;
 };
 
 export type FeatureFlagVariant = {

@@ -61,6 +61,10 @@
       "module": "./esm/service.js",
       "require": "./cjs/service.js"
     },
+    "./types": {
+      "types": "./esm/types.d.ts",
+      "import": "./esm/types.js"
+    },
     "./validate": {
       "types": "./esm/validate.d.ts",
       "import": "./esm/validate.js",

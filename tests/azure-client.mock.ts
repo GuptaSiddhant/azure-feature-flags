@@ -10,14 +10,35 @@ import {
   featureFlagPrefix,
   featureFlagContentType,
 } from "@azure/app-configuration";
-import { FeatureFlag } from "../src/types";
+import {
+  FeatureFlag,
+  FeatureFlagWithFilters,
+  FeatureFlagWithVariants,
+} from "../src/types";
 
 export { featureFlagPrefix, featureFlagContentType };
 
-export const dummyFeatureFlag: FeatureFlag = {
+export const dummyFeatureFlag: FeatureFlagWithFilters = {
   id: "feature",
   enabled: true,
   conditions: { client_filters: [] },
+};
+
+export const featureFlagWithVariants: FeatureFlagWithVariants = {
+  id: "feature",
+  enabled: false,
+  variants: [
+    { name: "var-a", configuration_value: true },
+    { name: "var-b", configuration_value: false },
+  ],
+  allocation: {
+    default_when_disabled: "var-a",
+    default_when_enabled: "var-b",
+    percentile: [
+      { from: 0, to: 50, variant: "var-a" },
+      { from: 50, to: 100, variant: "var-b" },
+    ],
+  },
 };
 
 export function generateDummyClient(

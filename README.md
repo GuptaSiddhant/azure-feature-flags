@@ -16,6 +16,7 @@ This package depends on `@azure/app-configuration` to generate the Azure `AppCon
   - [setFeatureFlag](#setFeatureFlag)
   - [deleteFeatureFlag](#deleteFeatureFlag)
 - [Validation API](#validation-api)
+  - [validateFeatureFlag](#validatefeatureflag)
   - [validateFeatureFlagWithFilters](#validatefeatureflagwithfilters)
     - [Default and TimeWindow filter](#default-and-timewindow-filter)
     - [Targeting filter](#targeting-filter)
@@ -121,6 +122,18 @@ const deleted: boolean = await deleteFeatureFlag(client, featureFlagKey);
 ```
 
 ## Validation API
+
+### `validateFeatureFlag`
+
+Validate both types of Feature Flags - Filters and Variants. The function calls respective validators under the hood to do the heavy lifting.
+
+> Note: If you know which type of Feature Flag you wish to validate, then directly import and use `validateFeatureFlagWithFilters` for filters and `validateFeatureFlagWithVariants` for variants.
+
+```ts
+import { validateFeatureFlag } from "azure-feature-flags/validate";
+
+const variant = validateFeatureFlag(featureFlag);
+```
 
 ### `validateFeatureFlagWithFilters`
 
@@ -248,7 +261,10 @@ const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
 import { validateFeatureFlagWithVariants } from "azure-feature-flags/validate";
 
 // featureFlag with variants. It will throw if the flag is of other type (filters)
-const variant = validateFeatureFlagWithVariants(featureFlag);
+const variant = validateFeatureFlagWithVariants(featureFlag, {
+  groups: [],
+  users: [],
+});
 ```
 
 ## License
