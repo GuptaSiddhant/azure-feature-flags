@@ -7,12 +7,9 @@
     "./allocate": "./src/allocate.ts",
     "./rollout": "./src/rollout.ts",
     "./service": "./src/service.ts",
-    "./types": "./src/types.ts",
     "./validate": "./src/validate.ts"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
     ".github",
     ".yarn",

@@ -47,9 +47,11 @@ export type FeatureFlagWithVariants = {
  * The `configuration_value` can be any valid JSON value.
  */
 export type FeatureFlagVariant = {
-  name: string;
+  name: FeatureFlagVariantName;
   configuration_value: JsonValue;
 };
+
+export type FeatureFlagVariantName = string;
 
 /**
  * Representation of Feature Flag Allocation object
@@ -67,7 +69,7 @@ export type FeatureFlagAllocation = {
  * Representation of Feature Flag Allocation Percentile object
  */
 export type FeatureFlagAllocationPercentile = {
-  variant: string;
+  variant: FeatureFlagVariantName;
   from: number;
   to: number;
 };
@@ -77,7 +79,7 @@ export type FeatureFlagAllocationPercentile = {
  * A variant can be allocated to a list of groups.
  */
 export type FeatureFlagAllocationGroup = {
-  variant: string;
+  variant: FeatureFlagVariantName;
   groups: Array<string>;
 };
 
@@ -86,7 +88,7 @@ export type FeatureFlagAllocationGroup = {
  * A variant can be allocated to a list of users.
  */
 export type FeatureFlagAllocationUser = {
-  variant: string;
+  variant: FeatureFlagVariantName;
   users: Array<string>;
 };
 
@@ -216,4 +218,4 @@ export type FeatureFlagHandleVariantAllocation = (
   flagId: string,
   percentiles: FeatureFlagAllocationPercentile[],
   seed?: number
-) => string;
+) => FeatureFlagVariantName;

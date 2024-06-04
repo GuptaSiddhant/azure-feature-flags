@@ -6,4 +6,9 @@
  */
 
 export { handleAllocateWithIncrement } from "./handlers/increment-allocate.js";
-export type { FeatureFlagHandleVariantAllocation } from "./types.js";
+export type {
+  FeatureFlagHandleVariantAllocation,
+  FeatureFlagAllocationPercentile,
+  FeatureFlagVariant,
+  FeatureFlagVariantName,
+} from "./types.js";

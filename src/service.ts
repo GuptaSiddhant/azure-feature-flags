@@ -7,36 +7,27 @@
 import type {
   AddConfigurationSettingParam,
   AppConfigurationClient,
-  ConfigurationSettingParam,
-  GetConfigurationSettingOptions,
 } from "@azure/app-configuration";
 import {
-  type GetFeatureFlagsOptions,
   extractFeatureFlagFromSetting,
   invariantAppConfigurationClient,
   iterateAppConfigurationFeatureFlags,
   featureFlagContentType,
   featureFlagPrefix,
 } from "./utils/app-config.js";
+import type {
+  GetFeatureFlagsOptions,
+  SetFeatureFlagOptions,
+  GetFeatureFlagByKeyOptions,
+} from "./utils/app-config.js";
 import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
 
 export type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
-export type { GetFeatureFlagsOptions } from "./utils/app-config.js";
-
-/**
- * Options for get a feature flag by key
- */
-export type GetFeatureFlagByKeyOptions = GetConfigurationSettingOptions & {
-  label?: string;
-};
-
-/**
- * Options for set (add/update) a feature flag
- */
-export type SetFeatureFlagOptions = Omit<
-  ConfigurationSettingParam,
-  "key" | "value" | "contentType"
->;
+export type {
+  GetFeatureFlagsOptions,
+  GetFeatureFlagByKeyOptions,
+  SetFeatureFlagOptions,
+} from "./utils/app-config.js";
 
 /**
  * Fetch all feature flags related settings from Azure App Configuration

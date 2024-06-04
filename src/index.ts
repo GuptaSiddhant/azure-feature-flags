@@ -7,9 +7,11 @@ import {
   getFeatureFlagsList,
   getFeatureFlagsRecord,
   setFeatureFlag,
-  type GetFeatureFlagByKeyOptions,
-  type GetFeatureFlagsOptions,
-  type SetFeatureFlagOptions,
+} from "./service.js";
+import type {
+  GetFeatureFlagByKeyOptions,
+  GetFeatureFlagsOptions,
+  SetFeatureFlagOptions,
 } from "./service.js";
 import { invariantAppConfigurationClient } from "./utils/app-config.js";
 import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
