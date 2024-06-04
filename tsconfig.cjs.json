@@ -4,7 +4,6 @@
     "moduleResolution": "Node",
     "module": "CommonJS",
     "outDir": "./cjs/",
-    "allowImportingTsExtensions": false,
     "noEmit": false
   },
   "include": ["./src"],

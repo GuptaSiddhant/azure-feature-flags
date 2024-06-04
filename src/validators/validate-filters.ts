@@ -4,15 +4,15 @@ import type {
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlagWithFiltersValidateOptions,
   FeatureFlagWithFilters,
-} from "../types";
+} from "../types.js";
 import {
   checkIsTargetingClientFilter,
   validateFeatureFlagTargetingFilter,
-} from "./validate-filter-targeting";
+} from "./validate-filter-targeting.js";
 import {
   checkIsTimeWindowClientFilter,
   validateFeatureFlagTimeWindowFilter,
-} from "./validate-filter-time-window";
+} from "./validate-filter-time-window.js";
 
 /**
  * Check if the Feature flag is of type with-filters.

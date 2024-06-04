@@ -4,10 +4,6 @@
  * Azure App Configuration for feature flags.
  */
 
-import {
-  featureFlagContentType,
-  featureFlagPrefix,
-} from "@azure/app-configuration";
 import type {
   AddConfigurationSettingParam,
   AppConfigurationClient,
@@ -19,14 +15,37 @@ import {
   extractFeatureFlagFromSetting,
   invariantAppConfigurationClient,
   iterateAppConfigurationFeatureFlags,
+  featureFlagContentType,
+  featureFlagPrefix,
 } from "./utils/app-config.js";
 import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
 
-// Getters
+export type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
+export type { GetFeatureFlagsOptions } from "./utils/app-config.js";
+
+/**
+ * Options for get a feature flag by key
+ */
+export type GetFeatureFlagByKeyOptions = GetConfigurationSettingOptions & {
+  label?: string;
+};
+
+/**
+ * Options for set (add/update) a feature flag
+ */
+export type SetFeatureFlagOptions = Omit<
+  ConfigurationSettingParam,
+  "key" | "value" | "contentType"
+>;
 
 /**
  * Fetch all feature flags related settings from Azure App Configuration
  * and parse them to a record/object.
+ *
+ * @example
+ * ```ts
+ * const featureFlags = await getFeatureFlagsRecord(client);
+ * ```
  */
 export async function getFeatureFlagsRecord(
   client: AppConfigurationClient,
@@ -45,6 +64,11 @@ export async function getFeatureFlagsRecord(
 /**
  * Fetch all feature flags related settings from Azure App Configuration
  * and parse them to a list/array.
+ *
+ * @example
+ * ```ts
+ * const featureFlags = await getFeatureFlagsList(client);
+ * ```
  */
 export async function getFeatureFlagsList(
   client: AppConfigurationClient,
@@ -63,11 +87,17 @@ export async function getFeatureFlagsList(
 /**
  * Fetch single feature flag related setting from Azure App Configuration
  * by its key/id and parse it.
+ *
+ * @example
+ * ```ts
+ * const featureFlagKey = "your-feature-flag-key";
+ * const featureFlag = await getFeatureFlagByKey(client, featureFlagKey);
+ * ```
  */
 export async function getFeatureFlagByKey(
   client: AppConfigurationClient,
   key: string,
-  options?: GetConfigurationSettingOptions & { label?: string }
+  options?: GetFeatureFlagByKeyOptions
 ): Promise<FeatureFlag | null> {
   invariantAppConfigurationClient(client, "getConfigurationSetting");
 
@@ -90,16 +120,24 @@ export async function getFeatureFlagByKey(
   }
 }
 
-// Setter
-
 /**
  * Add new or update existing feature flags related settings
  * to Azure App Configuration.
+ *
+ * @example
+ * ```ts
+ * const featureFlag: FeatureFlag = {
+ *   id: "your-feature-flag-id",
+ *   enabled: true,
+ *   conditions: { client_filters: [] },
+ * };
+ * const success: boolean = await setFeatureFlag(client, featureFlag);
+ * ```
  */
 export async function setFeatureFlag(
   client: AppConfigurationClient,
   featureFlag: FeatureFlag,
-  options: Omit<ConfigurationSettingParam, "key" | "value" | "contentType"> = {}
+  options?: SetFeatureFlagOptions
 ): Promise<boolean> {
   invariantAppConfigurationClient(client, "addConfigurationSetting");
   invariantAppConfigurationClient(client, "setConfigurationSetting");
@@ -129,11 +167,14 @@ export async function setFeatureFlag(
   }
 }
 
-// Delete-er
-
 /**
  * Delete existing feature flags related settings
  * from Azure App Configuration.
+ *  * @example
+ * ```ts
+ * const featureFlagKey = "your-feature-flag-key";
+ * const success: boolean = await deleteFeatureFlag(client, featureFlagKey);
+ * ```
  */
 export async function deleteFeatureFlag(
   client: AppConfigurationClient,

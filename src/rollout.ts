@@ -7,3 +7,4 @@
 
 export { handleRolloutWithHash } from "./handlers/hash-rollout.js";
 export { handleRolloutWithIncrement } from "./handlers/increment-rollout.js";
+export type { FeatureFlagHandleRollout } from "./types.js";

@@ -9,8 +9,24 @@
 export type {
   FeatureFlag,
   FeatureFlagVariant,
+  FeatureFlagCustomFilter,
+  FeatureFlagCustomFilterValidator,
+  FeatureFlagCustomFilterValidators,
   FeatureFlagWithFiltersValidateOptions,
+  FeatureFlagClientFilter,
+  FeatureFlagCustomFilterValidatorOptions,
+  FeatureFlagHandleRollout,
+  FeatureFlagTargetingFilter,
+  FeatureFlagTimeWindowFilter,
+  FeatureFlagWithVariants,
   FeatureFlagWithVariantsValidateOptions,
+  FeatureFlagAllocation,
+  FeatureFlagAllocationGroup,
+  FeatureFlagAllocationPercentile,
+  FeatureFlagAllocationUser,
+  FeatureFlagHandleVariantAllocation,
+  FeatureFlagWithFilters,
+  JsonValue,
 } from "./types.js";
 export { validateFeatureFlag } from "./validators/validate-all.js";
 export {

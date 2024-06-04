@@ -1,4 +1,5 @@
 {
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
   "name": "@gs/azure-feature-flags",
   "version": "1.0.1",
   "exports": {
@@ -9,9 +10,7 @@
     "./types": "./src/types.ts",
     "./validate": "./src/validate.ts"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": [
     ".github",
     ".yarn",

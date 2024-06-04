@@ -5,7 +5,7 @@ import type {
   FeatureFlagVariant,
   FeatureFlagWithVariants,
   FeatureFlagWithVariantsValidateOptions,
-} from "../types";
+} from "../types.js";
 
 /**
  * Check if the Feature flag is of type with-variants.

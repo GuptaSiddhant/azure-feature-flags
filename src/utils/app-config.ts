@@ -1,12 +1,13 @@
-import {
-  type AppConfigurationClient,
-  type ConfigurationSetting,
-  type ListConfigurationSettingsOptions,
-  featureFlagPrefix,
-  isFeatureFlag,
+import type {
+  AppConfigurationClient,
+  ConfigurationSetting,
+  ListConfigurationSettingsOptions,
 } from "@azure/app-configuration";
 import type { FeatureFlag } from "../types.js";
 
+/**
+ * Options for get all feature flags as record or list
+ */
 export type GetFeatureFlagsOptions = Omit<
   ListConfigurationSettingsOptions,
   "keyFilter"
@@ -41,7 +42,7 @@ export async function iterateAppConfigurationFeatureFlags(
 export function extractFeatureFlagFromSetting(
   setting: ConfigurationSetting
 ): FeatureFlag {
-  if (!isFeatureFlag(setting)) {
+  if (!isFeatureFlagSetting(setting)) {
     throw TypeError(
       `Setting with key ${setting.key} is not a valid FeatureFlag, make sure to have the correct content-type and a valid non-null value.`
     );
@@ -64,4 +65,31 @@ export function extractFeatureFlagFromSetting(
   }
 
   return json as FeatureFlag;
+}
+
+/**
+ * The content type for a FeatureFlag
+ */
+export const featureFlagContentType =
+  "application/vnd.microsoft.appconfig.ff+json;charset=utf-8";
+
+/**
+ * The prefix for feature flags.
+ */
+export const featureFlagPrefix = ".appconfig.featureflag/";
+
+/**
+ * Lets you know if the ConfigurationSetting is a feature flag.
+ *
+ * [Checks if the content type is featureFlagContentType `"application/vnd.microsoft.appconfig.ff+json;charset=utf-8"`]
+ */
+export function isFeatureFlagSetting(
+  setting: ConfigurationSetting
+): setting is ConfigurationSetting &
+  Required<Pick<ConfigurationSetting, "value">> {
+  return (
+    setting &&
+    setting.contentType === featureFlagContentType &&
+    typeof setting.value === "string"
+  );
 }

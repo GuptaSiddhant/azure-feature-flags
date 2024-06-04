@@ -2,19 +2,14 @@
 
 import "dotenv/config";
 import { AppConfigurationClient } from "@azure/app-configuration";
-import {
-  getFeatureFlagsList,
-  getFeatureFlagsRecord,
-  getFeatureFlagByKey,
-  setFeatureFlag,
-  deleteFeatureFlag,
-} from "../esm/service.js";
+import { FeatureFlagService } from "../esm/service.js";
 
 const connectionString = process.env.VITE_AZURE_CONNECTION_STRING;
 if (!connectionString)
   throw new Error("AZURE_CONFIG_ACCESS_STRING env missing");
 
 const client = new AppConfigurationClient(connectionString);
+const service = new FeatureFlagService(client);
 
 /** @type {import("../esm/types.js").FeatureFlag} */
 const flag = {
@@ -33,11 +28,11 @@ const flag = {
 };
 
 const operations = {
-  setFeatureFlag: () => setFeatureFlag(client, flag),
-  getFeatureFlagsList: () => getFeatureFlagsList(client),
-  getFeatureFlagsRecord: () => getFeatureFlagsRecord(client),
-  getFeatureFlagByKey: () => getFeatureFlagByKey(client, flag.id),
-  deleteFeatureFlag: () => deleteFeatureFlag(client, flag.id),
+  set: () => service.set(flag),
+  getList: () => service.getAllAsList(),
+  getRecord: () => service.getAllAsRecord(),
+  getByKey: () => service.getByKey(flag.id),
+  delete: () => service.delete(flag.id),
 };
 
 const keys = Object.keys(operations);
