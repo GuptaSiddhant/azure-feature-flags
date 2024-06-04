@@ -1237,7 +1237,6 @@ __metadata:
     dotenv: "npm:^16.4.5"
     react: "npm:19.0.0-rc-9d4fba0788-20240530"
     react-dom: "npm:19.0.0-rc-9d4fba0788-20240530"
-    react-types: "npm:^0.1.0"
     tailwindcss: "npm:^4.0.0-alpha.15"
     typescript: "npm:^5.4.0"
     vite: "npm:^5.2.12"
@@ -1246,7 +1245,7 @@ __metadata:
     "@azure/app-configuration": ^1
   peerDependenciesMeta:
     "@azure/app-configuration":
-      optional: false
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -2592,13 +2591,6 @@ __metadata:
   version: 0.14.2
   resolution: "react-refresh@npm:0.14.2"
   checksum: 10c0/875b72ef56b147a131e33f2abd6ec059d1989854b3ff438898e4f9310bfcc73acff709445b7ba843318a953cb9424bcc2c05af2b3d80011cee28f25aef3e2ebb
-  languageName: node
-  linkType: hard
-
-"react-types@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "react-types@npm:0.1.0"
-  checksum: 10c0/3e5538a47ed3bf0e56c413df6b40d8a8bd7d132a048b36afa34d091f2a5a1882cf2a8f71fe9f6592728a24e065d718a28a709fbf3ae8975822f4b4959e19b353
   languageName: node
   linkType: hard
 
