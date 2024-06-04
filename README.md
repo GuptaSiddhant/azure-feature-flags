@@ -60,7 +60,7 @@ deno add @gs/azure-feature-flags npm:@azure/app-configuration
 
 ## `class` `FeatureFlagService`
 
-Create and use a singular instance of service. It is wrapper around individually exported functions from [service API](#service-api).
+Create and use a singular instance of service. It is wrapper around individually exported functions from [service API](#service-api) and [validation API](#validation-api).
 
 > For better tree-shaking, you can import individual functions from their respective entry-points.
 
@@ -73,6 +73,9 @@ const created = await service.set({ id: "flag-id", enabled: true });
 const featureFlagsRecord = await service.getAllAsRecord();
 const featureFlagsList = await service.getAllAsList();
 const featureFlag = await service.getByKey("flag-id");
+const enabledOrVariant = await service.getByKeyAndValidate("flag-id", {
+  groups: ["admin"],
+});
 const deleted = await service.delete("flag-id");
 ```
 

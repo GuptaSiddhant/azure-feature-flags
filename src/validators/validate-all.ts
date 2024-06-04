@@ -39,6 +39,20 @@ export function validateFeatureFlag(
   options?: FeatureFlagWithFiltersValidateOptions
 ): boolean;
 
+/**
+ * Validate the any feature-flag object
+ *
+ * @param featureFlag Azure Feature Flag config object
+ * @param options Options for validation
+ * @returns if the feature flag should be enabled with given filters
+ */
+export function validateFeatureFlag(
+  featureFlag: FeatureFlag | null | undefined,
+  options?:
+    | FeatureFlagWithFiltersValidateOptions
+    | FeatureFlagWithVariantsValidateOptions
+): boolean;
+
 // implementation
 export function validateFeatureFlag(
   featureFlag: FeatureFlag | null | undefined,

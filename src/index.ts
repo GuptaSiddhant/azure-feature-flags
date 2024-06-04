@@ -14,7 +14,14 @@ import type {
   SetFeatureFlagOptions,
 } from "./service.js";
 import { invariantAppConfigurationClient } from "./utils/app-config.js";
-import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
+import { validateFeatureFlag } from "./validate";
+import type {
+  FeatureFlag,
+  FeatureFlagVariant,
+  FeatureFlagWithFiltersValidateOptions,
+  FeatureFlagWithVariantsValidateOptions,
+  FeatureFlagsRecord,
+} from "./types.js";
 
 /**
  * @module
@@ -28,7 +35,14 @@ export type {
   GetFeatureFlagsOptions,
   SetFeatureFlagOptions,
 } from "./service.js";
-export type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
+export type {
+  FeatureFlag,
+  FeatureFlagsRecord,
+  FeatureFlagVariant,
+  FeatureFlagVariantName,
+  FeatureFlagWithFiltersValidateOptions,
+  FeatureFlagWithVariantsValidateOptions,
+} from "./types.js";
 
 /**
  * Class based service for all Azure FeatureFlag.
@@ -46,6 +60,7 @@ export type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
  * const featureFlagsRecord = await service.getAllAsRecord();
  * const featureFlagsList = await service.getAllAsList();
  * const featureFlag = await service.getByKey("flag-id");
+ * const enabledOrVariant = await service.getByKeyAndValidate("flag-id", { groups: ["admin"] });
  * const deleted = await service.delete("flag-id")
  * ```
  */
@@ -82,5 +97,16 @@ export class FeatureFlagService {
 
   async delete(key: string, label?: string): Promise<boolean> {
     return await deleteFeatureFlag(this.#client, key, label);
+  }
+
+  async getByKeyAndValidate(
+    key: string,
+    options:
+      | FeatureFlagWithFiltersValidateOptions
+      | FeatureFlagWithVariantsValidateOptions
+  ): Promise<boolean | FeatureFlagVariant> {
+    const featureFlag = await this.getByKey(key);
+
+    return validateFeatureFlag(featureFlag, options);
   }
 }
