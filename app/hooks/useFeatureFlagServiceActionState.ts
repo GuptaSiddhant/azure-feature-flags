@@ -1,7 +1,8 @@
 import { AppConfigurationClient } from "@azure/app-configuration";
 import * as React from "react";
+import { FeatureFlagService } from "../../src";
 
-export default function useAzureClientActionState() {
+export default function useFeatureFlagServiceActionState() {
   return React.useActionState(async (_prev: unknown, formData: FormData) => {
     const connectionString = formData.get("connectionString")?.toString();
     if (!connectionString) {
@@ -17,7 +18,8 @@ export default function useAzureClientActionState() {
     }
 
     try {
-      return new AppConfigurationClient(connectionString);
+      const client = new AppConfigurationClient(connectionString);
+      return new FeatureFlagService(client);
     } catch {
       return "An error occurred while connecting! Try again.";
     }

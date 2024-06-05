@@ -1,25 +1,26 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import useAzureClientActionState from "./hooks/useAzureClientActionState";
-import { AppConfigurationClient } from "@azure/app-configuration";
-import Connect from "./Connect.tsx";
-import App from "./App.tsx";
-import { AzureClientContext } from "./contexts";
+import useFeatureFlagServiceActionState from "./hooks/useFeatureFlagServiceActionState";
+import Connect from "./Connect";
+import App from "./App";
+import { FFServiceContext } from "./contexts";
+import { FeatureFlagService } from "../src";
 
 function Main() {
-  const [clientOrError, action, isSubmitting] = useAzureClientActionState();
+  const [serviceOrError, action, isSubmitting] =
+    useFeatureFlagServiceActionState();
 
   return (
     <>
-      {clientOrError instanceof AppConfigurationClient ? (
-        <AzureClientContext.Provider value={clientOrError}>
+      {serviceOrError instanceof FeatureFlagService ? (
+        <FFServiceContext.Provider value={serviceOrError}>
           <App disconnectAction={action} />
-        </AzureClientContext.Provider>
+        </FFServiceContext.Provider>
       ) : (
         <Connect
           connectAction={action}
-          error={clientOrError}
+          error={serviceOrError}
           isLoading={isSubmitting}
         />
       )}

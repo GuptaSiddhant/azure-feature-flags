@@ -1,5 +1,5 @@
-import { AppConfigurationClient } from "@azure/app-configuration";
 import { createContext, use } from "react";
+import { FeatureFlagService } from "../src";
 
 export const RerenderAppContext = createContext<
   React.DispatchWithoutAction | undefined
@@ -10,11 +10,11 @@ export function useRerenderAppContext() {
   return context;
 }
 
-export const AzureClientContext = createContext<
-  AppConfigurationClient | undefined
->(undefined);
-export function useAzureClientContext() {
-  const context = use(AzureClientContext);
-  if (!context) throw new Error("Azure Context");
+export const FFServiceContext = createContext<FeatureFlagService | undefined>(
+  undefined
+);
+export function useFeatureFlagService() {
+  const context = use(FFServiceContext);
+  if (!context) throw new Error("FFS");
   return context;
 }

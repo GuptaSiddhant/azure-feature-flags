@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import Card from "./ui/Card.tsx";
-import Link from "./ui/Link.tsx";
+import Card from "./ui/Card";
+import Link from "./ui/Link";
 import useHashChange from "./hooks/useHashChange";
 import type { FeatureFlag } from "../src/types";
 

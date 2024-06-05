@@ -8,12 +8,23 @@ export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...env };
 
   return {
+    base: process.env.CI ? "/azure-feature-flags" : undefined,
+    build: {
+      minify: false,
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes("/node_modules/react")) return "react";
+            if (id.includes("/node_modules/@azure")) return "azure";
+          },
+        },
+      },
+    },
+    plugins: [react() as any, tailwindcss()],
     test: {
       coverage: { include: ["src"] },
       dir: "tests",
       benchmark: {},
     },
-    base: process.env.CI ? "/azure-feature-flags" : undefined,
-    plugins: [react() as any, tailwindcss()],
   };
 });

@@ -3,7 +3,7 @@ import Button from "./ui/Button";
 import Header from "./ui/Header";
 import Footer from "./ui/Footer";
 import FlagPage from "./FlagPage";
-import SideBar from "./Sidebar.tsx";
+import SideBar from "./Sidebar";
 import { useFeatureFlags } from "./hooks/useFeatureFlag";
 import { RerenderAppContext } from "./contexts";
 
