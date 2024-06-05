@@ -35,13 +35,13 @@ describe(invariantAppConfigurationClient, { concurrent: true }, () => {
     ).toThrowError(errorMessage);
   });
 
-  it("should return true if client has required method", () => {
+  it("should return nothing if client has required method", () => {
     expect(
       invariantAppConfigurationClient(
         { getConfigurationSetting: () => {} },
         "getConfigurationSetting"
       )
-    ).true;
+    ).undefined;
   });
 });
 
@@ -120,7 +120,7 @@ describe(extractFeatureFlagFromSetting, { concurrent: true }, () => {
         value: JSON.stringify({}),
       })
     ).toThrowError(
-      "Setting with key some-id is not a valid FeatureFlag, make sure to have the correct content-type and a valid non-null value."
+      "Setting with key some-id is not a valid FeatureFlag setting, make sure to have the correct content-type and a valid non-null value."
     );
   });
 

@@ -1,6 +1,21 @@
-import { AppConfigurationClient } from "@azure/app-configuration";
 import * as React from "react";
-import { FeatureFlagService } from "../../src";
+import { FeatureFlag, FeatureFlagService } from "../../src";
+import { AppConfigurationClientLite } from "../../src/client";
+
+const flag: FeatureFlag = {
+  id: "test-flag",
+  enabled: false,
+  conditions: {
+    client_filters: [
+      {
+        name: "Microsoft.Targeting",
+        parameters: {
+          Audience: { DefaultRolloutPercentage: 50 },
+        },
+      },
+    ],
+  },
+};
 
 export default function useFeatureFlagServiceActionState() {
   return React.useActionState(async (_prev: unknown, formData: FormData) => {
@@ -18,9 +33,11 @@ export default function useFeatureFlagServiceActionState() {
     }
 
     try {
-      const client = new AppConfigurationClient(connectionString);
+      const client = new AppConfigurationClientLite(connectionString);
+
       return new FeatureFlagService(client);
-    } catch {
+    } catch (error) {
+      console.error(error);
       return "An error occurred while connecting! Try again.";
     }
   }, undefined);

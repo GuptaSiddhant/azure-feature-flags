@@ -6,6 +6,7 @@ import type {
   ListConfigurationSettingsOptions,
 } from "@azure/app-configuration";
 import type { FeatureFlag } from "../types.js";
+import { AppConfigurationClientLite } from "../client.js";
 
 /**
  * Options for get all feature flags as record or list
@@ -13,13 +14,16 @@ import type { FeatureFlag } from "../types.js";
 export type GetFeatureFlagsOptions = Omit<
   ListConfigurationSettingsOptions,
   "keyFilter"
->;
+> & {
+  abortSignal?: AbortSignal;
+};
 
 /**
  * Options for get a feature flag by key
  */
 export type GetFeatureFlagByKeyOptions = GetConfigurationSettingOptions & {
   label?: string;
+  abortSignal?: AbortSignal;
 };
 
 /**
@@ -28,24 +32,34 @@ export type GetFeatureFlagByKeyOptions = GetConfigurationSettingOptions & {
 export type SetFeatureFlagOptions = Omit<
   ConfigurationSettingParam,
   "key" | "value" | "contentType"
->;
+> & { abortSignal?: AbortSignal };
 
 export function invariantAppConfigurationClient(
   client: unknown,
   method: keyof AppConfigurationClient
-): client is AppConfigurationClient {
+): asserts client is AppConfigurationClient {
   if (!client || typeof client !== "object" || !(method in client)) {
     throw new Error("'client' is not valid Azure AppConfigurationClient");
   }
-
-  return true;
 }
 
 export async function iterateAppConfigurationFeatureFlags(
-  client: AppConfigurationClient,
+  client: AppConfigurationClient | AppConfigurationClientLite,
   options: GetFeatureFlagsOptions = {},
   onFound: (flag: FeatureFlag) => void
 ): Promise<void> {
+  if (client instanceof AppConfigurationClientLite) {
+    const settings = await client.list(options);
+    for (const setting of settings) {
+      try {
+        onFound(extractFeatureFlagFromSetting(setting));
+      } catch {}
+    }
+    return;
+  }
+
+  invariantAppConfigurationClient(client, "listConfigurationSettings");
+
   Object.assign(options, { keyFilter: `${featureFlagPrefix}*` });
   const iterator = client.listConfigurationSettings(options);
 
@@ -61,7 +75,7 @@ export function extractFeatureFlagFromSetting(
 ): FeatureFlag {
   if (!isFeatureFlagSetting(setting)) {
     throw TypeError(
-      `Setting with key ${setting.key} is not a valid FeatureFlag, make sure to have the correct content-type and a valid non-null value.`
+      `Setting with key ${setting.key} is not a valid FeatureFlag setting, make sure to have the correct content-type and a valid non-null value.`
     );
   }
 
@@ -104,9 +118,11 @@ export function isFeatureFlagSetting(
   setting: ConfigurationSetting
 ): setting is ConfigurationSetting &
   Required<Pick<ConfigurationSetting, "value">> {
-  return (
+  const contentType = setting.contentType || (setting as any).content_type;
+  return Boolean(
     setting &&
-    setting.contentType === featureFlagContentType &&
-    typeof setting.value === "string"
+      contentType === featureFlagContentType &&
+      setting.value &&
+      typeof setting.value === "string"
   );
 }

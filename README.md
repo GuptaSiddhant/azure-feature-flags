@@ -13,6 +13,7 @@ This package depends on `@azure/app-configuration` to generate the Azure `AppCon
 - [Install](#install)
 - [FeatureFlagService](#class-featureflagservice)
 - [Service API](#service-api)
+  - [Create App configuration client](#create-app-configuration-client)
   - [getFeatureFlagsRecord](#getfeatureflagsrecord)
   - [getFeatureFlagsList](#getfeatureflagslist)
   - [getFeatureFlagByKey](#getFeatureFlagByKey)
@@ -32,28 +33,28 @@ This package depends on `@azure/app-configuration` to generate the Azure `AppCon
 
 ## Install
 
-### Node
+### NPM
 
 ```sh
-npm i azure-feature-flags @azure/app-configuration
+npm i azure-feature-flags
 ```
 
 ```sh
-yarn add azure-feature-flags @azure/app-configuration
+yarn add azure-feature-flags
 ```
 
 ```sh
-bun add azure-feature-flags @azure/app-configuration
+bun add azure-feature-flags
+```
+
+### JSR
+
+```sh
+npx jsr add @gs/azure-feature-flags
 ```
 
 ```sh
-npx jsr add @gs/azure-feature-flags npm:@azure/app-configuration
-```
-
-### Deno
-
-```sh
-deno add @gs/azure-feature-flags npm:@azure/app-configuration
+deno add @gs/azure-feature-flags
 ```
 
 > In all the examples below, the imports are done from `azure-feature-flags` package but for Deno, they need to be replaced with either `npm:azure-feature-flags` or `@gs/azure-feature-flags`.
@@ -67,7 +68,10 @@ Create and use a singular instance of service. It is wrapper around individually
 ```ts
 import { FeatureFlagService } from "azure-feature-flags";
 
-const service = new FeatureFlagService(client); // AppConfigurationClient
+// FeatureFlagService service requires `client` of type
+// `AppConfigurationClient` or `AppConfigurationClientLite`
+// See Service API section for generating it.
+const service = new FeatureFlagService(client);
 
 const created = await service.set({ id: "flag-id", enabled: true });
 const featureFlagsRecord = await service.getAllAsRecord();
@@ -81,14 +85,42 @@ const deleted = await service.delete("flag-id");
 
 ## Service API
 
-The Service API directly interact with Azure App Config. All Service API accepts Azure App Configuration `client` as first parameter which must be generated with the `@azure/app-configuration` package.
+The Service API directly interact with Azure App Config. All Service API accepts Azure App Configuration `client` as first parameter.
+It can be generated with the `@azure/app-configuration` package or via the internal tool.
 
-```ts
-import { AppConfigurationClient } from "@azure/app-configuration";
+> Pros and cons of generating `client` with `@azure/app-configuration` package.
+>
+> Pros:
+>
+> - Standard `client` that can be used with other Azure services
+> - Maintained by Azure.
+> - Decoupled with this library's maintenance.
+> - Need to authenticate with Azure CredentialToken.
+>
+> Cons:
+>
+> - Additional Bundle size of ~50kB (Gzipped) which is quite big for making couple of API calls
+> - The internal tool is well suited/optimised for making Feature Flag specific calls to Azure App Config.
 
-const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
-const client = new AppConfigurationClient(connectionString);
-```
+### Create App configuration client
+
+- With internal tool (preferred)
+
+  ```ts
+  import { AppConfigurationClientLite } from "azure-feature-flags/client";
+
+  const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
+  const client = new AppConfigurationClientLite(connectionString);
+  ```
+
+- With `"@azure/app-configuration"` package
+
+  ```ts
+  import { AppConfigurationClient } from "@azure/app-configuration";
+
+  const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
+  const client = new AppConfigurationClient(connectionString);
+  ```
 
 ### `getFeatureFlagsRecord`
 
@@ -173,7 +205,7 @@ Validate both types of Feature Flags - Filters and Variants. The function calls 
 ```ts
 import { validateFeatureFlag } from "azure-feature-flags/validate";
 
-const variant = validateFeatureFlag(featureFlag);
+const enabledOrVariant = validateFeatureFlag(featureFlag);
 ```
 
 ### `validateFeatureFlagWithFilters`

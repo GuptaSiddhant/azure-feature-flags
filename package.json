@@ -49,6 +49,12 @@
       "module": "./esm/allocate.js",
       "require": "./cjs/allocate.js"
     },
+    "./client": {
+      "types": "./esm/client.d.ts",
+      "import": "./esm/client.js",
+      "module": "./esm/client.js",
+      "require": "./cjs/client.js"
+    },
     "./rollout": {
       "types": "./esm/rollout.d.ts",
       "import": "./esm/rollout.js",

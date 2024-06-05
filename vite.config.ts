@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
     build: {
       minify: false,
       rollupOptions: {
+        external: ["crypto"],
         output: {
           manualChunks: (id) => {
             if (id.includes("/node_modules/react")) return "react";

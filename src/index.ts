@@ -14,7 +14,7 @@ import type {
   SetFeatureFlagOptions,
 } from "./service.js";
 import { invariantAppConfigurationClient } from "./utils/app-config.js";
-import { validateFeatureFlag } from "./validate";
+import { validateFeatureFlag } from "./validate.js";
 import type {
   FeatureFlag,
   FeatureFlagVariant,
@@ -22,6 +22,7 @@ import type {
   FeatureFlagWithVariantsValidateOptions,
   FeatureFlagsRecord,
 } from "./types.js";
+import { AppConfigurationClientLite } from "./client.js";
 
 /**
  * @module
@@ -65,10 +66,14 @@ export type {
  * ```
  */
 export class FeatureFlagService {
-  #client: AppConfigurationClient;
-  constructor(client: AppConfigurationClient) {
-    invariantAppConfigurationClient(client, "listConfigurationSettings");
-    this.#client = client;
+  #client: AppConfigurationClient | AppConfigurationClientLite;
+  constructor(client: AppConfigurationClientLite | AppConfigurationClient) {
+    if (client instanceof AppConfigurationClientLite) {
+      this.#client = client;
+    } else {
+      invariantAppConfigurationClient(client, "listConfigurationSettings");
+      this.#client = client;
+    }
   }
 
   async getAllAsRecord(

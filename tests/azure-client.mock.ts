@@ -53,7 +53,7 @@ export function generateDummyClient(
       async function* gen() {
         let index = 0;
         while (index < settings.length) {
-          yield settingResponse(settings[index]);
+          yield settingResponse(settings[index]!);
           index++;
         }
       }
@@ -70,18 +70,14 @@ export function generateDummyClient(
       return settingResponse(setting);
     },
 
-    async addConfigurationSetting(setting) {
-      if (typeof setting.value !== "string") throw new Error();
-      if (typeof JSON.parse(setting.value) !== "object") throw new Error();
-      // @ts-expect-error
-      settings.push(setting);
-      return setting as AddConfigurationSettingResponse;
-    },
-
     async setConfigurationSetting(setting) {
       const index = settings.findIndex((s) => s.key === setting.key);
-      if (index < 0) throw new Error();
-
+      if (index < 0) {
+        if (typeof setting.value !== "string") throw new Error();
+        if (typeof JSON.parse(setting.value) !== "object") throw new Error();
+        settings.push(setting as AddConfigurationSettingResponse);
+        return setting;
+      }
       settings.splice(index, 1, setting as ConfigurationSetting);
       return setting as SetConfigurationSettingResponse;
     },

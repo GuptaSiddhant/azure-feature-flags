@@ -2,7 +2,7 @@
 
 import "dotenv/config";
 import { AppConfigurationClient } from "@azure/app-configuration";
-import { FeatureFlagService } from "../esm/service.js";
+import { FeatureFlagService } from "../esm/index.js";
 
 const connectionString = process.env.VITE_AZURE_CONNECTION_STRING;
 if (!connectionString)

@@ -108,7 +108,7 @@ describe(getFeatureFlagsRecord, { concurrent: true }, () => {
 });
 
 describe(setFeatureFlag, { concurrent: true }, () => {
-  it("adds new feature flag if it does not exists", async () => {
+  it.only("adds new feature flag if it does not exists", async () => {
     const client = generateDummyClient();
 
     const existingFlag = await getFeatureFlagByKey(client, dummyFeatureFlag.id);

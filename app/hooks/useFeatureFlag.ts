@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { type FeatureFlag, FeatureFlagService } from "../../src";
-import { NEW_FLAG_HASH } from "../constants";
+import { type FeatureFlag } from "../../src";
 import { useFeatureFlagService } from "../contexts";
+import { NEW_FLAG_HASH } from "../constants";
 
 export function useFeatureFlag(flagId: string | undefined, seed?: number) {
   const service = useFeatureFlagService();
