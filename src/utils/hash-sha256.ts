@@ -1,9 +1,6 @@
-declare global {
-  const Deno: unknown;
-}
-
 export async function sha256Hmac(key: string, data: string): Promise<string> {
-  if (typeof window == "undefined" && typeof Deno === "undefined") {
+  // Node
+  if (checkIsNode()) {
     const { createHmac } = await import("node:crypto");
     return createHmac("SHA256", Buffer.from(key, "base64"))
       .update(data)
@@ -22,8 +19,8 @@ export async function sha256Hmac(key: string, data: string): Promise<string> {
 }
 
 export async function sha256(content: string | Uint8Array): Promise<string> {
-  //   Node
-  if (typeof window == "undefined" && typeof Deno === "undefined") {
+  // Node
+  if (checkIsNode()) {
     const { createHash } = await import("node:crypto");
     return createHash("SHA256").update(content).digest("base64");
   }
@@ -49,6 +46,14 @@ function uint8ArrayToString(array: Uint8Array): string {
   return btoa([...array].map((x) => String.fromCharCode(x)).join(""));
 }
 
-export function base64ToUint8Array(value: string): Uint8Array {
+function base64ToUint8Array(value: string): Uint8Array {
   return new Uint8Array([...atob(value)].map((x) => x.charCodeAt(0)));
+}
+
+function checkIsNode(): boolean {
+  return (
+    typeof process !== "undefined" &&
+    !!process.versions &&
+    !!process.versions.node
+  );
 }

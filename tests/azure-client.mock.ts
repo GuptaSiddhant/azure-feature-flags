@@ -3,7 +3,7 @@ import {
   ConfigurationSetting,
   featureFlagContentType,
   featureFlagPrefix,
-} from "../esm/utils/app-config";
+} from "../src/utils/app-config";
 import {
   FeatureFlag,
   FeatureFlagWithFilters,
