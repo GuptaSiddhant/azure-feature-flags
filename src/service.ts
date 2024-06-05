@@ -4,10 +4,6 @@
  * Azure App Configuration for feature flags.
  */
 
-import type {
-  AppConfigurationClient,
-  ConfigurationSetting,
-} from "@azure/app-configuration";
 import {
   extractFeatureFlagFromSetting,
   invariantAppConfigurationClient,
@@ -16,19 +12,15 @@ import {
   featureFlagPrefix,
 } from "./utils/app-config.js";
 import type {
-  GetFeatureFlagsOptions,
-  SetFeatureFlagOptions,
-  GetFeatureFlagByKeyOptions,
+  FeatureFlagServiceOptions,
+  ConfigurationSetting,
+  AppConfigurationClient,
 } from "./utils/app-config.js";
 import type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
 import { AppConfigurationClientLite } from "./client.js";
 
 export type { FeatureFlag, FeatureFlagsRecord } from "./types.js";
-export type {
-  GetFeatureFlagsOptions,
-  GetFeatureFlagByKeyOptions,
-  SetFeatureFlagOptions,
-} from "./utils/app-config.js";
+export type { FeatureFlagServiceOptions } from "./utils/app-config.js";
 
 /**
  * Fetch all feature flags related settings from Azure App Configuration
@@ -41,7 +33,7 @@ export type {
  */
 export async function getFeatureFlagsRecord(
   client: AppConfigurationClientLite | AppConfigurationClient,
-  options: GetFeatureFlagsOptions = {}
+  options: FeatureFlagServiceOptions = {}
 ): Promise<FeatureFlagsRecord> {
   const record: FeatureFlagsRecord = {};
   await iterateAppConfigurationFeatureFlags(client, options, (featureFlag) => {
@@ -62,7 +54,7 @@ export async function getFeatureFlagsRecord(
  */
 export async function getFeatureFlagsList(
   client: AppConfigurationClientLite | AppConfigurationClient,
-  options: GetFeatureFlagsOptions = {}
+  options: FeatureFlagServiceOptions = {}
 ): Promise<FeatureFlag[]> {
   const list: FeatureFlag[] = [];
   await iterateAppConfigurationFeatureFlags(client, options, (featureFlag) =>
@@ -85,7 +77,7 @@ export async function getFeatureFlagsList(
 export async function getFeatureFlagByKey(
   client: AppConfigurationClientLite | AppConfigurationClient,
   key: string,
-  options?: GetFeatureFlagByKeyOptions
+  options?: FeatureFlagServiceOptions
 ): Promise<FeatureFlag | null> {
   if (!key) {
     throw new Error("Feature flag key is missing");
@@ -96,8 +88,9 @@ export async function getFeatureFlagByKey(
       const setting = await client.get({
         ...options,
         keyFilter: key,
-        labelFilter: options?.label,
+        labelFilter: options?.labelFilter,
       });
+
       return setting ? extractFeatureFlagFromSetting(setting) : null;
     } catch {
       return null;
@@ -112,7 +105,7 @@ export async function getFeatureFlagByKey(
 
   try {
     const setting = await client.getConfigurationSetting(
-      { key, label: options?.label },
+      { key, label: options?.labelFilter },
       options
     );
 
@@ -139,7 +132,7 @@ export async function getFeatureFlagByKey(
 export async function setFeatureFlag(
   client: AppConfigurationClientLite | AppConfigurationClient,
   featureFlag: FeatureFlag,
-  options?: SetFeatureFlagOptions
+  options?: FeatureFlagServiceOptions
 ): Promise<boolean> {
   if (client instanceof AppConfigurationClientLite) {
     const setting: ConfigurationSetting = await client

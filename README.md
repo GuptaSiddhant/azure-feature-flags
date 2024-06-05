@@ -8,8 +8,6 @@
 [![NPM](https://img.shields.io/npm/v/azure-feature-flags)](https://www.npmjs.com/package/azure-feature-flags)
 [![JSR](https://jsr.io/badges/@gs/azure-feature-flags)](https://jsr.io/badges/@gs/azure-feature-flags)
 
-This package depends on `@azure/app-configuration` to generate the Azure `AppConfigurationClient`.
-
 - [Install](#install)
 - [FeatureFlagService](#class-featureflagservice)
 - [Service API](#service-api)
@@ -99,7 +97,7 @@ It can be generated with the `@azure/app-configuration` package or via the inter
 >
 > Cons:
 >
-> - Additional Bundle size of ~50kB (Gzipped) which is quite big for making couple of API calls
+> - Additional Bundle size of ~30kB (Gzipped) which is quite big for making couple of API calls
 > - The internal tool is well suited/optimised for making Feature Flag specific calls to Azure App Config.
 
 ### Create App configuration client
@@ -348,8 +346,6 @@ The options accepts `handleAllocate` function to override the default allocation
 
 ## License
 
-MIT
+MIT © 2024 Siddhant Gupta (@GuptaSiddhant)
 
----
-
-© 2024 Siddhant Gupta (GuptaSiddhant)
+MIT [License for Azure App Configuration SDK for JS](https://raw.githubusercontent.com/Azure/azure-sdk-for-js/main/sdk/appconfiguration/app-configuration/LICENSE)

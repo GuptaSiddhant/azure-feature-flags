@@ -1,38 +1,60 @@
-import type {
-  AppConfigurationClient,
-  ConfigurationSetting,
-  ConfigurationSettingParam,
-  GetConfigurationSettingOptions,
-  ListConfigurationSettingsOptions,
-} from "@azure/app-configuration";
 import type { FeatureFlag } from "../types.js";
 import { AppConfigurationClientLite } from "../client.js";
 
 /**
+ * A lightweight representation of Azure AppConfigurationClient.
+ *
+ * {@link import("@azure/app-configuration").AppConfigurationClient}
+ */
+export type AppConfigurationClient = {
+  listConfigurationSettings: (
+    options?: FeatureFlagServiceOptions
+  ) => ListConfigurationSettingsResult;
+  getConfigurationSetting: (
+    settingId: SettingId,
+    options?: FeatureFlagServiceOptions
+  ) => Promise<ConfigurationSetting>;
+  setConfigurationSetting: (
+    configurationSetting: ConfigurationSetting,
+    options?: FeatureFlagServiceOptions
+  ) => Promise<ConfigurationSetting>;
+  deleteConfigurationSetting: (
+    settingId: SettingId,
+    options?: FeatureFlagServiceOptions
+  ) => Promise<unknown>;
+};
+type SettingId = { etag?: string; key: string; label?: string };
+type ListConfigurationSettingsResult = {
+  next(): Promise<{ done?: boolean; value: ConfigurationSetting }>;
+  [Symbol.asyncIterator](): ListConfigurationSettingsResult;
+};
+
+export type ConfigurationSetting = {
+  etag?: string | undefined;
+  key: string;
+  label?: string | undefined;
+  contentType?: string | undefined;
+  tags?: { [propertyName: string]: string } | undefined;
+  value?: string | undefined;
+  isReadOnly: boolean;
+  lastModified?: Date | undefined;
+};
+
+/**
  * Options for get all feature flags as record or list
  */
-export type GetFeatureFlagsOptions = Omit<
-  ListConfigurationSettingsOptions,
-  "keyFilter"
-> & {
+export type FeatureFlagServiceOptions = {
+  acceptDateTime?: Date;
+  labelFilter?: string;
   abortSignal?: AbortSignal;
 };
 
 /**
- * Options for get a feature flag by key
+ * Options for a feature flag by key
  */
-export type GetFeatureFlagByKeyOptions = GetConfigurationSettingOptions & {
-  label?: string;
-  abortSignal?: AbortSignal;
+export type FeatureFlagServiceWithKeyOptions = FeatureFlagServiceOptions & {
+  keyFilter: string;
 };
-
-/**
- * Options for set (add/update) a feature flag
- */
-export type SetFeatureFlagOptions = Omit<
-  ConfigurationSettingParam,
-  "key" | "value" | "contentType"
-> & { abortSignal?: AbortSignal };
 
 export function invariantAppConfigurationClient(
   client: unknown,
@@ -45,7 +67,7 @@ export function invariantAppConfigurationClient(
 
 export async function iterateAppConfigurationFeatureFlags(
   client: AppConfigurationClient | AppConfigurationClientLite,
-  options: GetFeatureFlagsOptions = {},
+  options: FeatureFlagServiceOptions = {},
   onFound: (flag: FeatureFlag) => void
 ): Promise<void> {
   if (client instanceof AppConfigurationClientLite) {

@@ -1,14 +1,14 @@
 // @ts-check
 
 import "dotenv/config";
-import { AppConfigurationClient } from "@azure/app-configuration";
+import { AppConfigurationClientLite } from "../esm/client.js";
 import { FeatureFlagService } from "../esm/index.js";
 
 const connectionString = process.env.VITE_AZURE_CONNECTION_STRING;
 if (!connectionString)
   throw new Error("AZURE_CONFIG_ACCESS_STRING env missing");
 
-const client = new AppConfigurationClient(connectionString);
+const client = new AppConfigurationClientLite(connectionString);
 const service = new FeatureFlagService(client);
 
 /** @type {import("../esm/types.js").FeatureFlag} */

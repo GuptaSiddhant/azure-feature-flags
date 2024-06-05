@@ -1,18 +1,18 @@
-import type { ConfigurationSetting } from "@azure/app-configuration";
-import { featureFlagPrefix } from "./utils/app-config.js";
+import {
+  type ConfigurationSetting,
+  type FeatureFlagServiceWithKeyOptions,
+  type FeatureFlagServiceOptions,
+  featureFlagContentType,
+  featureFlagPrefix,
+} from "./utils/app-config.js";
 import { sha256, sha256Hmac } from "./utils/hash-sha256.js";
 
 const ConnectionStringRegex = /Endpoint=(.*);Id=(.*);Secret=(.*)/;
 
-export type MakeRequestOptions = {
-  acceptDateTime?: Date;
-  labelFilter?: string;
-  abortSignal?: AbortSignal;
-  fields?: string[];
-};
-export type MakeRequestWithKeyOptions = MakeRequestOptions & {
-  keyFilter: string;
-};
+export type {
+  FeatureFlagServiceOptions,
+  FeatureFlagServiceWithKeyOptions,
+} from "./utils/app-config.js";
 
 /**
  *
@@ -46,7 +46,7 @@ export class AppConfigurationClientLite {
   }
 
   async list(
-    options: MakeRequestOptions = {}
+    options: FeatureFlagServiceOptions = {}
   ): Promise<Array<ConfigurationSetting>> {
     try {
       const { items } = await this.#makeRequest<{
@@ -68,13 +68,15 @@ export class AppConfigurationClientLite {
   async get({
     keyFilter,
     ...options
-  }: MakeRequestWithKeyOptions): Promise<ConfigurationSetting | null> {
+  }: FeatureFlagServiceWithKeyOptions): Promise<ConfigurationSetting | null> {
     try {
-      return await this.#makeRequest<ConfigurationSetting>(
+      const setting = await this.#makeRequest<ConfigurationSetting>(
         this.#prependFeatureFlagPrefix(keyFilter),
         options,
         "GET"
       );
+      setting.contentType = featureFlagContentType;
+      return setting;
     } catch {
       return null;
     }
@@ -83,7 +85,7 @@ export class AppConfigurationClientLite {
   async delete({
     keyFilter,
     ...options
-  }: MakeRequestWithKeyOptions): Promise<ConfigurationSetting | null> {
+  }: FeatureFlagServiceWithKeyOptions): Promise<ConfigurationSetting | null> {
     try {
       return await this.#makeRequest<ConfigurationSetting>(
         this.#prependFeatureFlagPrefix(keyFilter),
@@ -97,7 +99,7 @@ export class AppConfigurationClientLite {
 
   async set(
     setting: ConfigurationSetting,
-    options: MakeRequestOptions = {}
+    options: FeatureFlagServiceOptions = {}
   ): Promise<ConfigurationSetting | null> {
     try {
       return await this.#makeRequest<ConfigurationSetting>(
@@ -113,13 +115,12 @@ export class AppConfigurationClientLite {
 
   async #makeRequest<T = unknown>(
     path: string,
-    options: Partial<MakeRequestWithKeyOptions>,
+    options: Partial<FeatureFlagServiceWithKeyOptions>,
     method?: "GET" | "DELETE" | "PUT",
     body?: BodyInit,
     validateResponse?: (json: object) => boolean
   ): Promise<T> {
-    const { abortSignal, acceptDateTime, fields, labelFilter, keyFilter } =
-      options;
+    const { abortSignal, acceptDateTime, labelFilter, keyFilter } = options;
 
     const searchParams = new URLSearchParams();
     searchParams.set("api-version", "2023-10-01");
@@ -129,14 +130,11 @@ export class AppConfigurationClientLite {
     if (labelFilter) {
       searchParams.set("label", labelFilter);
     }
-    if (fields) {
-      searchParams.set("select", fields.join(","));
-    }
 
     const headers = new Headers();
     headers.set(
       "Accept",
-      "application/vnd.microsoft.appconfig.kvset+json, application/problem+json"
+      `${featureFlagContentType}, application/problem+json`
     );
     headers.set("Content-Type", "application/vnd.microsoft.appconfig.kv+json");
     if (acceptDateTime) {

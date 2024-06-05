@@ -4,7 +4,7 @@ declare global {
 
 export async function sha256Hmac(key: string, data: string): Promise<string> {
   if (typeof window == "undefined" && typeof Deno === "undefined") {
-    const { createHmac } = await import("crypto");
+    const { createHmac } = await import("node:crypto");
     return createHmac("SHA256", Buffer.from(key, "base64"))
       .update(data)
       .digest("base64");
@@ -24,7 +24,7 @@ export async function sha256Hmac(key: string, data: string): Promise<string> {
 export async function sha256(content: string | Uint8Array): Promise<string> {
   //   Node
   if (typeof window == "undefined" && typeof Deno === "undefined") {
-    const { createHash } = await import("crypto");
+    const { createHash } = await import("node:crypto");
     return createHash("SHA256").update(content).digest("base64");
   }
   // Browser

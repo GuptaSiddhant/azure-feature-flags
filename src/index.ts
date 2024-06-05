@@ -1,6 +1,5 @@
 /* c8 ignore start */
 
-import type { AppConfigurationClient } from "@azure/app-configuration";
 import {
   deleteFeatureFlag,
   getFeatureFlagByKey,
@@ -9,10 +8,9 @@ import {
   setFeatureFlag,
 } from "./service.js";
 import type {
-  GetFeatureFlagByKeyOptions,
-  GetFeatureFlagsOptions,
-  SetFeatureFlagOptions,
-} from "./service.js";
+  AppConfigurationClient,
+  FeatureFlagServiceOptions,
+} from "./utils/app-config.js";
 import { invariantAppConfigurationClient } from "./utils/app-config.js";
 import { validateFeatureFlag } from "./validate.js";
 import type {
@@ -31,11 +29,7 @@ import { AppConfigurationClientLite } from "./client.js";
  * Also it can be used to validate the flags.
  */
 
-export type {
-  GetFeatureFlagByKeyOptions,
-  GetFeatureFlagsOptions,
-  SetFeatureFlagOptions,
-} from "./service.js";
+export type { FeatureFlagServiceOptions } from "./utils/app-config.js";
 export type {
   FeatureFlag,
   FeatureFlagsRecord,
@@ -50,11 +44,11 @@ export type {
  *
  * @example
  * ```ts
- * import { AppConfigurationClient } from "@azure/app-configuration";
+ * import { AppConfigurationClientLite } from "azure-feature-flags/client";
  * import { FeatureFlagService } from "azure-feature-flags"
  *
  * const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
- * const client = new AppConfigurationClient(connectionString);
+ * const client = new AppConfigurationClientLite(connectionString);
  * const service = new FeatureFlagService(client);
  *
  * const created = await service.set({ id: "flag-id", enabled: true });
@@ -77,25 +71,27 @@ export class FeatureFlagService {
   }
 
   async getAllAsRecord(
-    options?: GetFeatureFlagsOptions
+    options?: FeatureFlagServiceOptions
   ): Promise<FeatureFlagsRecord> {
     return await getFeatureFlagsRecord(this.#client, options);
   }
 
-  async getAllAsList(options?: GetFeatureFlagsOptions): Promise<FeatureFlag[]> {
+  async getAllAsList(
+    options?: FeatureFlagServiceOptions
+  ): Promise<FeatureFlag[]> {
     return await getFeatureFlagsList(this.#client, options);
   }
 
   async getByKey(
     key: string,
-    options?: GetFeatureFlagByKeyOptions
+    options?: FeatureFlagServiceOptions
   ): Promise<FeatureFlag | null> {
     return await getFeatureFlagByKey(this.#client, key, options);
   }
 
   async set(
     featureFlag: FeatureFlag,
-    options?: SetFeatureFlagOptions
+    options?: FeatureFlagServiceOptions
   ): Promise<boolean> {
     return await setFeatureFlag(this.#client, featureFlag, options);
   }

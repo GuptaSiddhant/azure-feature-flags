@@ -10,13 +10,18 @@ export default defineConfig(({ mode }) => {
   return {
     base: process.env.CI ? "/azure-feature-flags" : undefined,
     build: {
-      minify: false,
+      minify: true,
       rollupOptions: {
-        external: ["crypto"],
+        external: ["node:crypto"],
         output: {
           manualChunks: (id) => {
-            if (id.includes("/node_modules/react")) return "react";
             if (id.includes("/node_modules/@azure")) return "azure";
+            if (
+              id.includes("/node_modules/react") ||
+              id.includes("/node_modules/scheduler")
+            ) {
+              return "react";
+            }
           },
         },
       },

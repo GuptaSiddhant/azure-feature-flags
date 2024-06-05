@@ -57,7 +57,7 @@ describe(getFeatureFlagByKey, { concurrent: true }, () => {
   it("should fetch a flag with key and label", async () => {
     const client = generateDummyClient(flagObject);
     const flag = await getFeatureFlagByKey(client, flagObject.id, {
-      label: "test-label",
+      labelFilter: "test-label",
     });
 
     expect(flag).toEqual(flagObject);

@@ -46,7 +46,7 @@
     "skipDefaultLibCheck": true /* Skip type checking .d.ts files that are included with TypeScript. */,
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
 
-    "types": ["react/experimental"]
+    "types": ["react/experimental", "node"]
   },
   "include": ["./src", "./app"],
   "exclude": ["node_modules", "dist", "tests"]

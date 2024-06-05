@@ -1,15 +1,9 @@
-import type {
-  AddConfigurationSettingResponse,
+import {
   AppConfigurationClient,
   ConfigurationSetting,
-  DeleteConfigurationSettingResponse,
-  GetConfigurationSettingResponse,
-  SetConfigurationSettingResponse,
-} from "@azure/app-configuration";
-import {
-  featureFlagPrefix,
   featureFlagContentType,
-} from "@azure/app-configuration";
+  featureFlagPrefix,
+} from "../esm/utils/app-config";
 import {
   FeatureFlag,
   FeatureFlagWithFilters,
@@ -75,18 +69,18 @@ export function generateDummyClient(
       if (index < 0) {
         if (typeof setting.value !== "string") throw new Error();
         if (typeof JSON.parse(setting.value) !== "object") throw new Error();
-        settings.push(setting as AddConfigurationSettingResponse);
+        settings.push(setting);
         return setting;
       }
-      settings.splice(index, 1, setting as ConfigurationSetting);
-      return setting as SetConfigurationSettingResponse;
+      settings.splice(index, 1, setting);
+      return setting;
     },
 
     async deleteConfigurationSetting(setting) {
       const index = settings.findIndex((s) => s.key === setting.key);
       if (index < 0) throw new Error();
       settings.splice(index, 1);
-      return {} as DeleteConfigurationSettingResponse;
+      return {};
     },
   } as AppConfigurationClient;
 }
@@ -105,7 +99,7 @@ export function wrapFeatureFlagInSetting(
 function settingResponse(setting: ConfigurationSetting) {
   return {
     statusCode: 200,
-    _response: {} as GetConfigurationSettingResponse["_response"],
+    _response: {},
     ...setting,
-  } satisfies GetConfigurationSettingResponse;
+  };
 }
