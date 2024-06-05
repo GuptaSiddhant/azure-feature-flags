@@ -19,8 +19,7 @@ export type {
  * A lightweight alternative to Azure's AppConfigurationClient to generate
  * a client for working with Feature Flags.
  *
- * > [!Note]
- * > This `lite` alternative should be used outside the scope of this library.
+ * > [Note] This `lite` alternative should NOT be used outside the scope of this library.
  *
  * @example
  * ```ts
