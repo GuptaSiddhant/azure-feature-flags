@@ -35,8 +35,8 @@ jobs:
 
       - run: yarn install
 
-      - name: Publish to JSR
-        run: npx -y jsr publish
-
       - name: Publish to NPM
         run: npm publish
+
+      - name: Publish to JSR
+        run: npx -y jsr publish

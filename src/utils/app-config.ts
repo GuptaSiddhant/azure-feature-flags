@@ -3,7 +3,7 @@ import { AppConfigurationClientLite } from "../client.js";
 
 /**
  * A lightweight representation of Azure AppConfigurationClient.
- *
+ * @internal
  * {@link import("@azure/app-configuration").AppConfigurationClient}
  */
 export type AppConfigurationClient = {
@@ -29,6 +29,9 @@ type ListConfigurationSettingsResult = {
   [Symbol.asyncIterator](): ListConfigurationSettingsResult;
 };
 
+/**
+ * Representation of a entry (setting) in  Azure App Configuration
+ */
 export type ConfigurationSetting = {
   etag?: string | undefined;
   key: string;

@@ -10,17 +10,24 @@ import { sha256, sha256Hmac } from "./utils/hash-sha256.js";
 const ConnectionStringRegex = /Endpoint=(.*);Id=(.*);Secret=(.*)/;
 
 export type {
+  ConfigurationSetting,
   FeatureFlagServiceOptions,
   FeatureFlagServiceWithKeyOptions,
 } from "./utils/app-config.js";
 
 /**
+ * A lightweight alternative to Azure's AppConfigurationClient to generate
+ * a client for working with Feature Flags.
+ *
+ * > [!Note]
+ * > This `lite` alternative should be used outside the scope of this library.
  *
  * @example
  * ```ts
  * import { AppConfigurationClientLite } from "azure-feature-flags/client";
  * const connectionString = process.env.AZURE_CONFIG_ACCESS_STRING;
  * const client = new AppConfigurationClientLite(connectionString);
+ * //    ^ use this client anywhere in this library's services.
  * ```
  */
 export class AppConfigurationClientLite {
