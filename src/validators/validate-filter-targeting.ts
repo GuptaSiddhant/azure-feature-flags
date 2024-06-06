@@ -1,4 +1,4 @@
-import { handleRolloutWithIncrement } from "../handlers/increment-rollout.js";
+import { handleRolloutWithHash } from "../handlers/rollout-hash.js";
 import type {
   FeatureFlagCustomFilterValidatorOptions,
   FeatureFlagClientFilter,
@@ -17,51 +17,81 @@ export function checkIsTargetingClientFilter(
   return typeof Audience === "object";
 }
 
-export function validateFeatureFlagTargetingFilter(
+export async function validateFeatureFlagTargetingFilter(
   filter: FeatureFlagTargetingFilter,
   options: FeatureFlagCustomFilterValidatorOptions,
-  handleRollout: FeatureFlagHandleRollout = handleRolloutWithIncrement
-): boolean {
-  // The options is currently tested against both included and excluded audiences.
-  // In future, more options can be added which are tested against either audiences.
-  const { groups, users } = options;
-  const { DefaultRolloutPercentage, Exclusion, Groups, Users } =
-    filter.parameters.Audience;
+  handleRollout: FeatureFlagHandleRollout = handleRolloutWithHash
+): Promise<boolean> {
+  const { groups, users, ignoreCase } = options;
+  const {
+    DefaultRolloutPercentage = 0,
+    Exclusion,
+    Groups,
+    Users,
+  } = filter.parameters.Audience;
 
-  // 1. If user is excluded, return false.
-  if (users.length > 0 && checkTargetingFilterInput(Exclusion?.Users, users)) {
-    return false;
-  }
-  // 2. If group is excluded, return false
-  if (
-    groups.length > 0 &&
-    checkTargetingFilterInput(Exclusion?.Groups, groups)
-  ) {
-    return false;
+  if (Exclusion) {
+    // 1. If user is excluded, return false.
+    if (
+      users.length > 0 &&
+      Exclusion.Users &&
+      Exclusion.Users.length > 0 &&
+      compareStringLists(Exclusion.Users, users, ignoreCase)
+    ) {
+      return false;
+    }
+    // 2. If group is excluded, return false
+    if (
+      groups.length > 0 &&
+      Exclusion.Groups &&
+      Exclusion.Groups.length > 0 &&
+      compareStringLists(Exclusion.Groups, groups, ignoreCase)
+    ) {
+      return false;
+    }
   }
   // 3. If user is included, return true.
-  if (users.length > 0 && Users && Users.length > 0) {
-    return checkTargetingFilterInput(Users, users);
+  if (
+    users.length > 0 &&
+    Users &&
+    Users.length > 0 &&
+    compareStringLists(Users, users, ignoreCase)
+  ) {
+    return true;
   }
-  // 4. If group is included, return true (partial rollout not implemented).
+  // 4. If group is included, return true.
   if (groups.length > 0 && Groups && Groups.length > 0) {
     for (const Group of Groups) {
-      if (groups.includes(Group.Name)) {
-        return handleRollout(options.key, Group.RolloutPercentage, Group.Name);
+      if (compareStringLists([Group.Name], groups, ignoreCase)) {
+        if (Group.RolloutPercentage === 100) return true;
+        if (Group.RolloutPercentage === 0) return false;
+        const rolloutId = generateRolloutId(options.key, Group.Name, users);
+        return await handleRollout(rolloutId, Group.RolloutPercentage);
       }
     }
-    return false;
   }
-  // 5 If default rollout is valid, return true (partial rollout not implemented).
-  return handleRollout(options.key, DefaultRolloutPercentage, undefined);
+  // 5 return result of default rollout
+  if (DefaultRolloutPercentage === 100) return true;
+  if (DefaultRolloutPercentage === 0) return false;
+  const rolloutId = generateRolloutId(options.key, "-Default-", users);
+  return await handleRollout(rolloutId, DefaultRolloutPercentage);
 }
 
-function checkTargetingFilterInput(
-  audiences: string[] | undefined,
-  inputs: string[]
+function generateRolloutId(key: string, groupName: string, users?: string[]) {
+  return [key, groupName, users?.join(",")].filter(Boolean).join("=|=");
+}
+
+function compareStringLists(
+  audiences: string[],
+  inputs: string[],
+  ignoreCase: boolean
 ): boolean {
-  if (!audiences || audiences.length === 0) {
-    return false;
+  if (ignoreCase) {
+    const lowercaseInputs = inputs.map((input) => input.toLowerCase());
+    return audiences.some((audience) =>
+      lowercaseInputs.includes(audience.toLowerCase())
+    );
   }
+
   return audiences.some((audience) => inputs.includes(audience));
 }

@@ -1,3 +1,5 @@
+type Encoding = "base64" | "hex";
+
 export async function sha256Hmac(key: string, data: string): Promise<string> {
   // Node
   if (checkIsNode()) {
@@ -18,11 +20,14 @@ export async function sha256Hmac(key: string, data: string): Promise<string> {
     .then(uint8ArrayToString);
 }
 
-export async function sha256(content: string | Uint8Array): Promise<string> {
+export async function sha256(
+  content: string | Uint8Array,
+  encoding: Encoding = "base64"
+): Promise<string> {
   // Node
   if (checkIsNode()) {
     const { createHash } = await import("node:crypto");
-    return createHash("SHA256").update(content).digest("base64");
+    return createHash("SHA256").update(content).digest(encoding);
   }
   // Browser
   const crypto = globalThis.crypto || (globalThis as any).msCrypto;
@@ -30,7 +35,13 @@ export async function sha256(content: string | Uint8Array): Promise<string> {
   const buf = typeof content === "string" ? strToBuf(content) : content;
   const hash = await subtle.digest({ name: "sha-256" }, buf);
 
-  return uint8ArrayToString(new Uint8Array(hash));
+  switch (encoding) {
+    case "hex":
+      return buf2hex(hash);
+    case "base64":
+    default:
+      return uint8ArrayToString(new Uint8Array(hash));
+  }
 }
 
 function strToBuf(str: string): Uint8Array {
@@ -40,6 +51,12 @@ function strToBuf(str: string): Uint8Array {
     buf[i] = str.charCodeAt(i);
   }
   return buf;
+}
+
+function buf2hex(buffer: ArrayBuffer): string {
+  return [...new Uint8Array(buffer)]
+    .map((x) => x.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function uint8ArrayToString(array: Uint8Array): string {

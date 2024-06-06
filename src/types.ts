@@ -105,14 +105,7 @@ export type FeatureFlagClientFilter =
  */
 export type FeatureFlagTargetingFilter = {
   name: "Microsoft.Targeting";
-  parameters: {
-    Audience: {
-      DefaultRolloutPercentage: number;
-      Exclusion?: { Groups?: Array<string>; Users?: Array<string> };
-      Groups?: Array<{ Name: string; RolloutPercentage: number }>;
-      Users?: Array<string>;
-    };
-  };
+  parameters: { Audience: FeatureFlagTargetingAudience };
 };
 
 /**
@@ -124,6 +117,16 @@ export type FeatureFlagTimeWindowFilter = {
     | { End: string; Start: null }
     | { End: null; Start: string }
     | { End: string; Start: string };
+};
+
+/**
+ * Audience for targeting filter
+ */
+export type FeatureFlagTargetingAudience = {
+  DefaultRolloutPercentage: number;
+  Exclusion?: { Groups?: Array<string>; Users?: Array<string> };
+  Groups?: Array<{ Name: string; RolloutPercentage: number }>;
+  Users?: Array<string>;
 };
 
 /**
@@ -149,6 +152,7 @@ export type FeatureFlagCustomFilterValidatorOptions = {
   groups: Array<string>;
   key: string;
   users: Array<string>;
+  ignoreCase: boolean;
 };
 
 /**
@@ -167,6 +171,11 @@ export type FeatureFlagWithFiltersValidateOptions = {
   groups?: Array<string>;
   /** User ID to validate the feature flag against */
   users?: Array<string>;
+  /**
+   * Ignore case (case-insensitive) while comparing groups and users.
+   * @default false
+   */
+  ignoreCase?: boolean;
   /** Handle and validate custom filters */
   customFilterValidators?: FeatureFlagCustomFilterValidators;
   /**
@@ -174,16 +183,22 @@ export type FeatureFlagWithFiltersValidateOptions = {
    * By default, it only checks if rolloutPercentage > 0.
    */
   handleRollout?: FeatureFlagHandleRollout;
+  /**
+   * Since the library does not implicitly throw error
+   * to prevent breaking the app,
+   * or log to console to preserve privacy.
+   * `onError` can be used to throw or log.
+   */
+  onError?: (error: Error) => void;
 };
 
 /**
  * Function type for defining a handler for rollout mechanism.
  */
 export type FeatureFlagHandleRollout = (
-  flagId: string,
-  rolloutPercentage: number,
-  groupName?: string
-) => boolean;
+  rolloutId: string,
+  rolloutPercentage: number
+) => boolean | Promise<boolean>;
 
 /**
  * Representation of all valid JSON values.
@@ -205,10 +220,22 @@ export type FeatureFlagWithVariantsValidateOptions = {
   /** User ID to validate the feature flag against */
   users?: Array<string>;
   /**
+   * Ignore case (case-insensitive) while comparing groups and users.
+   * @default false
+   */
+  ignoreCase?: boolean;
+  /**
    * Function to handle allocation.
    * By default, it uses increment-allocation
    */
   handleAllocate?: FeatureFlagHandleVariantAllocation;
+  /**
+   * Since the library does not implicitly throw error
+   * to prevent breaking the app,
+   * or log to console to preserve privacy.
+   * `onError` can be used to throw or log.
+   */
+  onError?: (error: Error) => void;
 };
 
 /**
@@ -218,4 +245,4 @@ export type FeatureFlagHandleVariantAllocation = (
   flagId: string,
   percentiles: FeatureFlagAllocationPercentile[],
   seed?: number
-) => FeatureFlagVariantName;
+) => FeatureFlagVariantName | Promise<FeatureFlagVariantName>;

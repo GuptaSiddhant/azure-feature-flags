@@ -16,13 +16,6 @@ function generateHandleRolloutWithIncrement(): FeatureFlagHandleRollout {
     rolloutPercentage,
     groupName = "default"
   ) {
-    if (rolloutPercentage === 100) {
-      return true;
-    }
-    if (rolloutPercentage === 0) {
-      return false;
-    }
-
     const mapKey = `${key}-.-${groupName}-.-${rolloutPercentage}`;
     if (!infoMap.has(mapKey)) {
       const result = createRatioFromFraction(rolloutPercentage / 100);

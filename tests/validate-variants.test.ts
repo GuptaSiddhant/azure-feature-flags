@@ -35,14 +35,15 @@ describe(checkIsFeatureFlagWithVariants, () => {
 });
 
 describe(validateFeatureFlagWithVariants, { concurrent: true }, () => {
-  it("should throw error for invalid feature flag", () => {
+  it("should throw error for invalid feature flag", async () => {
     // @ts-expect-error
-    expect(() => validateFeatureFlagWithVariants(undefined)).toThrowError(
-      "There are no variants in the Feature Flag."
-    );
+    expect(await validateFeatureFlagWithVariants(undefined)).null;
+    // (
+    //   "There are no variants in the Feature Flag."
+    // );
   });
 
-  it("should return only variant", () => {
+  it("should return only variant", async () => {
     const featureFlag: FeatureFlagWithVariants = {
       id: "feature",
       enabled: false,
@@ -53,13 +54,13 @@ describe(validateFeatureFlagWithVariants, { concurrent: true }, () => {
         percentile: [{ from: 0, to: 100, variant: "var-a" }],
       },
     };
-    expect(validateFeatureFlagWithVariants(featureFlag)).toEqual({
+    expect(await validateFeatureFlagWithVariants(featureFlag)).toEqual({
       name: "var-a",
       configuration_value: true,
     });
   });
 
-  it("should return default variant for disabled feature flag", () => {
+  it("should return default variant for disabled feature flag", async () => {
     const featureFlag: FeatureFlagWithVariants = {
       id: "feature",
       enabled: false,
@@ -76,13 +77,13 @@ describe(validateFeatureFlagWithVariants, { concurrent: true }, () => {
         ],
       },
     };
-    expect(validateFeatureFlagWithVariants(featureFlag)).toEqual({
+    expect(await validateFeatureFlagWithVariants(featureFlag)).toEqual({
       name: "var-a",
       configuration_value: true,
     });
   });
 
-  it("should return variant override for group", () => {
+  it("should return variant override for group", async () => {
     const featureFlag: FeatureFlagWithVariants = {
       id: "feature",
       enabled: true,
@@ -103,21 +104,21 @@ describe(validateFeatureFlagWithVariants, { concurrent: true }, () => {
     };
 
     expect(
-      validateFeatureFlagWithVariants(featureFlag, { groups: ["en-gb"] })
+      await validateFeatureFlagWithVariants(featureFlag, { groups: ["en-gb"] })
     ).toEqual({
       name: "var-b",
       configuration_value: false,
     });
 
     expect(
-      validateFeatureFlagWithVariants(featureFlag, { groups: ["en-us"] })
+      await validateFeatureFlagWithVariants(featureFlag, { groups: ["en-us"] })
     ).toEqual({
       name: "var-a",
       configuration_value: true,
     });
   });
 
-  it("should return variant override for user", () => {
+  it("should return variant override for user", async () => {
     const featureFlag: FeatureFlagWithVariants = {
       id: "feature",
       enabled: true,
@@ -138,14 +139,16 @@ describe(validateFeatureFlagWithVariants, { concurrent: true }, () => {
     };
 
     expect(
-      validateFeatureFlagWithVariants(featureFlag, { users: ["test-username"] })
+      await validateFeatureFlagWithVariants(featureFlag, {
+        users: ["test-username"],
+      })
     ).toEqual({
       name: "var-b",
       configuration_value: false,
     });
 
     expect(
-      validateFeatureFlagWithVariants(featureFlag, {
+      await validateFeatureFlagWithVariants(featureFlag, {
         users: ["other-username"],
       })
     ).toEqual({
@@ -154,7 +157,7 @@ describe(validateFeatureFlagWithVariants, { concurrent: true }, () => {
     });
   });
 
-  it("should return allocated variant", () => {
+  it("should return allocated variant", async () => {
     const featureFlag: FeatureFlagWithVariants = {
       id: "feature",
       enabled: true,
@@ -171,13 +174,13 @@ describe(validateFeatureFlagWithVariants, { concurrent: true }, () => {
         ],
       },
     };
-    expect(validateFeatureFlagWithVariants(featureFlag)).toEqual({
+    expect(await validateFeatureFlagWithVariants(featureFlag)).toEqual({
       name: "var-a",
       configuration_value: true,
     });
   });
 
-  it("should return default variant for enabled feature flag", () => {
+  it("should return default variant for enabled feature flag", async () => {
     const featureFlag: FeatureFlagWithVariants = {
       id: "feature",
       enabled: true,
@@ -191,7 +194,7 @@ describe(validateFeatureFlagWithVariants, { concurrent: true }, () => {
         default_when_enabled: "var-b",
       },
     };
-    expect(validateFeatureFlagWithVariants(featureFlag)).toEqual({
+    expect(await validateFeatureFlagWithVariants(featureFlag)).toEqual({
       name: "var-b",
       configuration_value: false,
     });

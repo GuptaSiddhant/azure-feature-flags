@@ -203,7 +203,7 @@ Validate both types of Feature Flags - Filters and Variants. The function calls 
 ```ts
 import { validateFeatureFlag } from "azure-feature-flags/validate";
 
-const enabledOrVariant = validateFeatureFlag(featureFlag);
+const enabledOrVariant = await validateFeatureFlag(featureFlag);
 ```
 
 ### `validateFeatureFlagWithFilters`
@@ -221,7 +221,7 @@ If filters are not set on the flag, the validation returns the value set in `fea
 ```ts
 import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
 
-const isValid: boolean = validateFeatureFlagWithFilters(featureFlag);
+const isValid: boolean = await validateFeatureFlagWithFilters(featureFlag);
 ```
 
 #### Targeting filter
@@ -231,13 +231,16 @@ When a group(s) or user(s) are provided, the value is matched against the target
 ```ts
 import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
 
-const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
+const isValid: boolean = await validateFeatureFlagWithFilters(featureFlag, {
   groups: ["editor"],
   users: ["user-id"],
 });
 ```
 
 ##### Handle rollout
+
+By default, for a given flag-key and groupName, the function generates a static hash.
+That hash is converted to a percentage and compare with rolloutPercentage. This is standard rollout method used in Azure's DotNet SDK.
 
 ###### Built-in handlers
 
@@ -257,24 +260,9 @@ The package exports some rollout handlers which can be used instead of creating 
   import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
   import { handleRolloutWithIncrement } from "azure-feature-flags/rollout";
 
-  const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
+  const isValid: boolean = await validateFeatureFlagWithFilters(featureFlag, {
     groups: ["editor"],
     handleRollout: handleRolloutWithIncrement,
-  });
-  ```
-
-- `handleRolloutWithHash`
-
-  For a given flag-key and groupName, the function generates a static hash.
-  That hash is converted to a number and compare with rolloutPercentage
-
-  ```ts
-  import { validateFeatureFlagWithFilters } from "azure-feature-flags/validate";
-  import { handleRolloutWithHash } from "azure-feature-flags/rollout";
-
-  const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
-    groups: ["editor"],
-    handleRollout: handleRolloutWithHash,
   });
   ```
 
@@ -295,7 +283,7 @@ const handleRollout: FeatureFlagHandleRollout = (
   return groupName === "editor" && rolloutPercentage > Math.random() * 100;
 };
 
-const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
+const isValid: boolean = await validateFeatureFlagWithFilters(featureFlag, {
   groups: ["editor"],
   handleRollout,
 });
@@ -313,7 +301,7 @@ import {
   type FeatureFlagCustomFilterValidator,
 } from "azure-feature-flags/validate";
 
-const myFilterValidator: FeatureFlagCustomFilterValidator = (
+const myFilterValidator: FeatureFlagCustomFilterValidator = async (
   filter,
   options
 ) => {
@@ -323,7 +311,7 @@ const myFilterValidator: FeatureFlagCustomFilterValidator = (
   );
 };
 
-const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
+const isValid: boolean = await validateFeatureFlagWithFilters(featureFlag, {
   customFilterValidators: { "my-filter-name": myFilterValidator },
 });
 ```
@@ -336,7 +324,7 @@ const isValid: boolean = validateFeatureFlagWithFilters(featureFlag, {
 import { validateFeatureFlagWithVariants } from "azure-feature-flags/validate";
 
 // featureFlag with variants. It will throw if the flag is of other type (filters)
-const variant = validateFeatureFlagWithVariants(featureFlag, {
+const variant = await validateFeatureFlagWithVariants(featureFlag, {
   groups: [],
   users: [],
 });

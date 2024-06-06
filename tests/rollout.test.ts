@@ -1,36 +1,34 @@
 import { describe, it, expect } from "vitest";
+import { handleRolloutWithIncrement } from "../src/handlers/rollout-increment";
 import {
   handleRolloutWithHash,
-  handleRolloutWithIncrement,
-} from "../src/rollout";
+  calcContextPercentage,
+} from "../src/handlers/rollout-hash";
 
 const flagId = "test-flag";
 
-describe(handleRolloutWithHash, { concurrent: true }, () => {
-  it("should return true if groupName: undefined, percentage: 50", () => {
-    expect(handleRolloutWithHash(flagId, 50)).true;
-  });
-  it("should return true if groupName: undefined, percentage: 75", () => {
-    expect(handleRolloutWithHash(flagId, 75)).true;
+describe(handleRolloutWithHash, { concurrent: true }, async () => {
+  const rolloutId = `${flagId}=|=fi-fi`;
+  const contextPercentage = await calcContextPercentage(rolloutId);
+
+  it(`should return false if rolloutPercentage < contextPercentage (${contextPercentage})`, async () => {
+    expect(await handleRolloutWithHash(rolloutId, contextPercentage - 10))
+      .false;
   });
 
-  it("should return true if groupName: fi-fi, percentage: 50", () => {
-    expect(handleRolloutWithHash(flagId, 50, "fi-fi")).true;
-  });
-  it("should return true if groupName: fi-fi, percentage: 75", () => {
-    expect(handleRolloutWithHash(flagId, 75, "fi-fi")).true;
-  });
-  it("should return true if groupName: fi-fi, percentage: 1", () => {
-    expect(handleRolloutWithHash(flagId, 1, "fi-fi")).false;
+  it(`should return true if rolloutPercentage > contextPercentage (${contextPercentage})`, async () => {
+    expect(await handleRolloutWithHash(rolloutId, contextPercentage + 10)).true;
   });
 
-  it("should return true if percentage: 100", () => {
-    expect(handleRolloutWithHash(flagId, 100)).true;
-    expect(handleRolloutWithHash(flagId, 100)).true;
+  it(`should return false if rolloutPercentage = contextPercentage (${contextPercentage})`, async () => {
+    expect(await handleRolloutWithHash(rolloutId, contextPercentage)).false;
   });
-  it("should return false if percentage: 0", () => {
-    expect(handleRolloutWithHash(flagId, 0)).false;
-    expect(handleRolloutWithHash(flagId, 0)).false;
+
+  it("should return true if percentage: 100", async () => {
+    expect(await handleRolloutWithHash(rolloutId, 100)).true;
+  });
+  it("should return false if percentage: 0", async () => {
+    expect(await handleRolloutWithHash(rolloutId, 0)).false;
   });
 });
 

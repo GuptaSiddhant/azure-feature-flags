@@ -22,71 +22,85 @@ export function checkIsFeatureFlagWithVariants(
  * @param featureFlag Azure Feature Flag with Variants
  * @param options Options for validation
  * @returns the allocated variant
- * @throws if feature flag is invalid or does not
  */
-export function validateFeatureFlagWithVariants(
+export async function validateFeatureFlagWithVariants(
   featureFlag: FeatureFlagWithVariants,
   options?: FeatureFlagWithVariantsValidateOptions
-): FeatureFlagVariant {
-  if (!featureFlag || featureFlag.variants.length < 1) {
-    throw new ReferenceError("There are no variants in the Feature Flag.");
-  }
+): Promise<FeatureFlagVariant | null> {
+  try {
+    if (
+      !featureFlag ||
+      !featureFlag.variants ||
+      featureFlag.variants.length < 1
+    ) {
+      throw new ReferenceError("There are no variants in the Feature Flag.");
+    }
 
-  const { allocation, enabled, variants } = featureFlag;
+    const { allocation, enabled, variants } = featureFlag;
 
-  if (variants.length === 1) {
-    return variants[0]!;
-  }
+    if (variants.length === 1 || !allocation) {
+      return variants[0]!;
+    }
 
-  const variantMap = new Map<string, FeatureFlagVariant>();
-  for (const variant of variants) {
-    variantMap.set(variant.name, variant);
-  }
+    const variantMap = new Map<string, FeatureFlagVariant>();
+    for (const variant of variants) {
+      variantMap.set(variant.name, variant);
+    }
 
-  if (!enabled) {
+    if (!enabled) {
+      return getVariantFromVariantMap(
+        variantMap,
+        allocation.default_when_disabled
+      );
+    }
+
+    // Overrides - Users
+    const users = options?.users ?? [];
+    if (users.length > 0 && allocation.user && allocation.user.length > 0) {
+      for (const allocUser of allocation.user) {
+        if (allocUser.users.some((user) => users.includes(user))) {
+          return getVariantFromVariantMap(variantMap, allocUser.variant);
+        }
+      }
+    }
+
+    // Overrides - Groups
+    const groups = options?.groups ?? [];
+    if (groups.length > 0 && allocation.group && allocation.group.length > 0) {
+      for (const allocGroup of allocation.group) {
+        if (allocGroup.groups.some((group) => groups.includes(group))) {
+          return getVariantFromVariantMap(variantMap, allocGroup.variant);
+        }
+      }
+    }
+
+    // Allocate based on percentile
+    if (allocation.percentile && allocation.percentile.length > 0) {
+      verifyAllocationPercentile(allocation.percentile);
+
+      const handleAllocate =
+        options?.handleAllocate ?? handleAllocateWithIncrement;
+
+      const variantName = await handleAllocate(
+        featureFlag.id,
+        allocation.percentile,
+        allocation.seed
+      );
+
+      return getVariantFromVariantMap(variantMap, variantName);
+    }
+
     return getVariantFromVariantMap(
       variantMap,
-      allocation.default_when_disabled
+      allocation.default_when_enabled
     );
-  }
-
-  // Overrides - Users
-  const users = options?.users ?? [];
-  if (users.length > 0 && allocation.user && allocation.user.length > 0) {
-    for (const allocUser of allocation.user) {
-      if (allocUser.users.some((user) => users.includes(user))) {
-        return getVariantFromVariantMap(variantMap, allocUser.variant);
-      }
+  } catch (error) {
+    if (error instanceof Error) {
+      options?.onError?.(error);
     }
+
+    return null;
   }
-
-  // Overrides - Groups
-  const groups = options?.groups ?? [];
-  if (groups.length > 0 && allocation.group && allocation.group.length > 0) {
-    for (const allocGroup of allocation.group) {
-      if (allocGroup.groups.some((group) => groups.includes(group))) {
-        return getVariantFromVariantMap(variantMap, allocGroup.variant);
-      }
-    }
-  }
-
-  // Allocate based on percentile
-  if (allocation.percentile && allocation.percentile.length > 0) {
-    verifyAllocationPercentile(allocation.percentile);
-
-    const handleAllocate =
-      options?.handleAllocate ?? handleAllocateWithIncrement;
-
-    const variantName = handleAllocate(
-      featureFlag.id,
-      allocation.percentile,
-      allocation.seed
-    );
-
-    return getVariantFromVariantMap(variantMap, variantName);
-  }
-
-  return getVariantFromVariantMap(variantMap, allocation.default_when_enabled);
 }
 
 export function getVariantFromVariantMap(

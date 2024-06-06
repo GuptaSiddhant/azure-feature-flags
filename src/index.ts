@@ -108,6 +108,6 @@ export class FeatureFlagService {
   ): Promise<boolean | FeatureFlagVariant> {
     const featureFlag = await this.getByKey(key);
 
-    return validateFeatureFlag(featureFlag, options);
+    return await validateFeatureFlag(featureFlag, options);
   }
 }

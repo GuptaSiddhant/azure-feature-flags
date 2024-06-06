@@ -3,23 +3,23 @@ import { validateFeatureFlag } from "../src/validators/validate-all";
 import { dummyFeatureFlag, featureFlagWithVariants } from "./azure-client.mock";
 
 describe(validateFeatureFlag, () => {
-  it("null", () => {
-    expect(validateFeatureFlag(null)).false;
+  it("null", async () => {
+    expect(await validateFeatureFlag(null)).false;
   });
 
-  it("filters", () => {
-    expect(validateFeatureFlag(dummyFeatureFlag)).true;
+  it("filters", async () => {
+    expect(await validateFeatureFlag(dummyFeatureFlag)).true;
   });
 
-  it("variants", () => {
-    expect(validateFeatureFlag(featureFlagWithVariants)).toEqual({
+  it("variants", async () => {
+    expect(await validateFeatureFlag(featureFlagWithVariants)).toEqual({
       configuration_value: true,
       name: "var-a",
     });
   });
 
-  it("should throw error if type of flag is unsupported", () => {
+  it("should return null if type of flag is unsupported", async () => {
     // @ts-expect-error
-    expect(validateFeatureFlag({ id: "test", enabled: true })).true;
+    expect(await validateFeatureFlag({ id: "test", enabled: true })).null;
   });
 });

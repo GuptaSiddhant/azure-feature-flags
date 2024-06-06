@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { sha1 } from "../src/utils/hash-sha-1";
+import { sha256 } from "../src/utils/hash-sha256";
 
-describe(sha1, () => {
-  it("should match snapshots", () => {
-    expect(sha1("test")).toMatchInlineSnapshot(
-      `"a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"`
+describe(sha256, () => {
+  it("should match snapshots", async () => {
+    expect(await sha256("test")).toMatchInlineSnapshot(
+      `"n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg="`
     );
-    expect(sha1("flag-.-group")).toMatchInlineSnapshot(
-      `"76162787155f23d6cbf1a6ff4b742c8be38eb9b7"`
+    expect(await sha256("flag-.-group")).toMatchInlineSnapshot(
+      `"lVWcBYmF05jGiZkRaLT6rds7yDRPZCapqMBI9cFw3hQ="`
     );
   });
 });

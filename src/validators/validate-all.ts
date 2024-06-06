@@ -22,10 +22,10 @@ import {
  * @param options Options for validation
  * @returns the variant that is allocated for given allocations
  */
-export function validateFeatureFlag(
+export async function validateFeatureFlag(
   featureFlag: FeatureFlagWithVariants,
   options?: FeatureFlagWithVariantsValidateOptions
-): FeatureFlagVariant;
+): Promise<FeatureFlagVariant | null>;
 
 /**
  * Validate the feature-flag object with filters.
@@ -34,10 +34,10 @@ export function validateFeatureFlag(
  * @param options Options for validation
  * @returns if the feature flag should be enabled with given filters
  */
-export function validateFeatureFlag(
+export async function validateFeatureFlag(
   featureFlag: FeatureFlagWithFilters | null | undefined,
   options?: FeatureFlagWithFiltersValidateOptions
-): boolean;
+): Promise<boolean>;
 
 /**
  * Validate the any feature-flag object
@@ -46,18 +46,18 @@ export function validateFeatureFlag(
  * @param options Options for validation
  * @returns if the feature flag should be enabled with given filters
  */
-export function validateFeatureFlag(
+export async function validateFeatureFlag(
   featureFlag: FeatureFlag | null | undefined,
   options?:
     | FeatureFlagWithFiltersValidateOptions
     | FeatureFlagWithVariantsValidateOptions
-): boolean;
+): Promise<boolean>;
 
 // implementation
-export function validateFeatureFlag(
+export async function validateFeatureFlag(
   featureFlag: FeatureFlag | null | undefined,
   options?: FeatureFlagWithFiltersValidateOptions
-): boolean | FeatureFlagVariant {
+): Promise<boolean | FeatureFlagVariant | null> {
   if (
     !featureFlag ||
     typeof featureFlag !== "object" ||
@@ -75,6 +75,12 @@ export function validateFeatureFlag(
     return validateFeatureFlagWithVariants(featureFlag, options);
   }
 
-  // @ts-expect-error
-  return featureFlag.enabled;
+  options?.onError?.(
+    new Error(
+      "The validator is not setup to validate this featureFlag => " +
+        JSON.stringify(featureFlag)
+    )
+  );
+
+  return null;
 }

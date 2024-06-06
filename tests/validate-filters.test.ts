@@ -28,28 +28,28 @@ describe(checkIsFeatureFlagWithFilters, () => {
 });
 
 describe("Without filters", { concurrent: true }, () => {
-  it("should return false for invalid feature flag", () => {
-    expect(validateFeatureFlagWithFilters(undefined)).false;
+  it("should return false for invalid feature flag", async () => {
+    expect(await validateFeatureFlagWithFilters(undefined)).false;
   });
 
-  it("should return false for disabled feature flag", () => {
+  it("should return false for disabled feature flag", async () => {
     const featureFlag: FeatureFlagWithFilters = {
       id: "feature",
       enabled: false,
       conditions: { client_filters: [] },
     };
 
-    expect(validateFeatureFlagWithFilters(featureFlag)).false;
+    expect(await validateFeatureFlagWithFilters(featureFlag)).false;
   });
 
-  it("should return true for valid and enabled feature flag with no filters", () => {
+  it("should return true for valid and enabled feature flag with no filters", async () => {
     const featureFlag: FeatureFlagWithFilters = {
       id: "feature",
       enabled: true,
       conditions: { client_filters: [] },
     };
 
-    expect(validateFeatureFlagWithFilters(featureFlag)).true;
+    expect(await validateFeatureFlagWithFilters(featureFlag)).true;
   });
 });
 
@@ -82,62 +82,65 @@ describe("Targeting filter", { concurrent: true }, () => {
   };
 
   // Groups
-  it("should return false where included locale group is missing", () => {
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["en-us"] }))
-      .false;
+  it("should return true where included locale group is matching (ignore case)", async () => {
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, {
+        groups: ["en-GB"],
+        ignoreCase: true,
+      })
+    ).true;
   });
-  it("should return true where included locale group is matching", () => {
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["en-gb"] }))
-      .true;
+  it("should return false where excluded locale group is matching", async () => {
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, { groups: ["de-de"] })
+    ).false;
   });
-  it("should return false where excluded locale group is matching", () => {
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["de-de"] }))
-      .false;
-  });
-  it("should return false where included locale group is matching with RolloutPercentage=0", () => {
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["fi-fi"] }))
-      .false;
+  it("should return false where included locale group is matching with RolloutPercentage=0", async () => {
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, { groups: ["fi-fi"] })
+    ).false;
   });
 
   // Users
-  it("should return false where included user is missing", () => {
+  it("should return false where included user is missing", async () => {
     expect(
-      validateFeatureFlagWithFilters(featureFlag, { users: ["test-user-5"] })
+      await validateFeatureFlagWithFilters(featureFlag, {
+        users: ["test-user-5"],
+      })
     ).false;
   });
-  it("should return true where included user is matching", () => {
+  it("should return true where included user is matching", async () => {
     expect(
-      validateFeatureFlagWithFilters(featureFlag, { users: ["test-user-1"] })
+      await validateFeatureFlagWithFilters(featureFlag, {
+        users: ["test-user-1"],
+      })
     ).true;
   });
-  it("should return false where excluded user is matching", () => {
+  it("should return false where excluded user is matching", async () => {
     expect(
-      validateFeatureFlagWithFilters(featureFlag, { users: ["test-user-3"] })
+      await validateFeatureFlagWithFilters(featureFlag, {
+        users: ["test-user-3"],
+      })
     ).false;
   });
 
-  it("should use custom handleRollout callback", () => {
-    const handleRollout: FeatureFlagHandleRollout = (
-      _key,
-      percentage,
-      groupName
-    ) => {
-      if (!groupName) return percentage > 50;
-      return percentage > 75;
+  it("should use custom handleRollout callback", async () => {
+    const handleRollout: FeatureFlagHandleRollout = (_key, percentage) => {
+      return percentage > 50;
     };
 
-    expect(validateFeatureFlagWithFilters(featureFlag, { handleRollout }))
+    expect(await validateFeatureFlagWithFilters(featureFlag, { handleRollout }))
       .false;
 
     expect(
-      validateFeatureFlagWithFilters(featureFlag, {
+      await validateFeatureFlagWithFilters(featureFlag, {
         groups: ["sv-se"],
         handleRollout,
       })
     ).false;
 
     expect(
-      validateFeatureFlagWithFilters(featureFlag, {
+      await validateFeatureFlagWithFilters(featureFlag, {
         groups: ["en-gb"],
         handleRollout,
       })
@@ -145,19 +148,23 @@ describe("Targeting filter", { concurrent: true }, () => {
   });
 
   // Default
-  it("should return true if no options are provided and DefaultRollout > 0", () => {
-    expect(validateFeatureFlagWithFilters(featureFlag, {})).true;
+  it("should return true if no options are provided and DefaultRollout > 0", async () => {
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, {
+        handleRollout: (_, rollout) => rollout >= 0,
+      })
+    ).true;
   });
 
   // This test should be at the end of block because it modifies the feature flag object
   it(
     "should return false if no options are provided and DefaultRollout = 0",
     { sequential: true },
-    () => {
+    async () => {
       featureFlag.conditions.client_filters![0].parameters[
         "Audience"
       ].DefaultRolloutPercentage = 0;
-      expect(validateFeatureFlagWithFilters(featureFlag, {})).false;
+      expect(await validateFeatureFlagWithFilters(featureFlag, {})).false;
     }
   );
 });
@@ -179,20 +186,20 @@ describe("Time window filter", { concurrent: true }, () => {
     },
   };
 
-  it("should return false before Start date", () => {
+  it("should return false before Start date", async () => {
     vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag)).false;
+    expect(await validateFeatureFlagWithFilters(featureFlag)).false;
   });
-  it("should return false after End date", () => {
+  it("should return false after End date", async () => {
     vi.setSystemTime(new Date("Thu, 18 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag)).false;
+    expect(await validateFeatureFlagWithFilters(featureFlag)).false;
   });
-  it("should return true between Start and End date", () => {
+  it("should return true between Start and End date", async () => {
     vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag)).true;
+    expect(await validateFeatureFlagWithFilters(featureFlag)).true;
   });
 
-  it("should throw error if both Start and End are missing (treat as custom filter)", () => {
+  it("should return false (and error) if both Start and End are missing (treat as custom filter)", async () => {
     const filter: FeatureFlagClientFilter = {
       name: "Microsoft.TimeWindow",
       parameters: {},
@@ -201,11 +208,16 @@ describe("Time window filter", { concurrent: true }, () => {
       ...featureFlag,
       conditions: { client_filters: [filter] },
     };
-    expect(() => validateFeatureFlagWithFilters(customFlag)).toThrowError(
-      `Custom filter validator is not implemented for: '${filter.name}'`
+
+    const errorFn = vi.fn();
+    expect(
+      await validateFeatureFlagWithFilters(customFlag, { onError: errorFn })
+    ).false;
+    expect(errorFn).toBeCalledWith(
+      Error(`Custom filter validator is not implemented for: '${filter.name}'`)
     );
   });
-  it("should throw error if Start or End are not string (treat as custom filter)", () => {
+  it("should return false (and error) if Start or End are not string (treat as custom filter)", async () => {
     const filter: FeatureFlagClientFilter = {
       name: "Microsoft.TimeWindow",
       // @ts-expect-error
@@ -215,13 +227,18 @@ describe("Time window filter", { concurrent: true }, () => {
       ...featureFlag,
       conditions: { client_filters: [filter] },
     };
-    expect(() => validateFeatureFlagWithFilters(customFlag)).toThrowError(
-      `Custom filter validator is not implemented for: '${filter.name}'`
+
+    const errorFn = vi.fn();
+    expect(
+      await validateFeatureFlagWithFilters(customFlag, { onError: errorFn })
+    ).false;
+    expect(errorFn).toBeCalledWith(
+      Error(`Custom filter validator is not implemented for: '${filter.name}'`)
     );
   });
 });
 
-describe("Custom filter", { concurrent: true }, () => {
+describe("Custom filter", { concurrent: true }, async () => {
   const customFilter = { name: "my-filter", parameters: { foo: "bar" } };
   const featureFlag: FeatureFlagWithFilters = {
     id: "feature",
@@ -229,15 +246,21 @@ describe("Custom filter", { concurrent: true }, () => {
     conditions: { client_filters: [customFilter] },
   };
 
-  it("should throw error if a custom filter is found and not handled", () => {
-    expect(() => validateFeatureFlagWithFilters(featureFlag)).toThrowError(
-      `Custom filter validator is not implemented for: '${customFilter.name}'`
+  const errorFn = vi.fn();
+  it("should return false (and error) if a custom filter is found and not handled", async () => {
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, { onError: errorFn })
+    );
+    expect(errorFn).toBeCalledWith(
+      Error(
+        `Custom filter validator is not implemented for: '${customFilter.name}'`
+      )
     );
   });
 
-  it("should return false when custom filter does not validate", () => {
+  it("should return false when custom filter does not validate", async () => {
     expect(
-      validateFeatureFlagWithFilters(featureFlag, {
+      await validateFeatureFlagWithFilters(featureFlag, {
         customFilterValidators: {
           "my-filter": (filter) => filter.parameters["foo"] === "abc",
         },
@@ -245,9 +268,9 @@ describe("Custom filter", { concurrent: true }, () => {
     ).false;
   });
 
-  it("should return true when custom filter does correctly validate", () => {
+  it("should return true when custom filter does correctly validate", async () => {
     expect(
-      validateFeatureFlagWithFilters(featureFlag, {
+      await validateFeatureFlagWithFilters(featureFlag, {
         customFilterValidators: {
           "my-filter": (filter) => filter.parameters["foo"] === "bar",
         },
@@ -256,7 +279,7 @@ describe("Custom filter", { concurrent: true }, () => {
   });
 });
 
-describe("Multiple filters (OR)", { concurrent: true }, () => {
+describe("Multiple filters (OR)", async () => {
   const featureFlag: FeatureFlagWithFilters = {
     id: "feature",
     enabled: true,
@@ -268,6 +291,7 @@ describe("Multiple filters (OR)", { concurrent: true }, () => {
             Audience: {
               Groups: [{ Name: "en-gb", RolloutPercentage: 100 }],
               DefaultRolloutPercentage: 50,
+              Exclusion: { Groups: ["en-us"] },
             },
           },
         },
@@ -282,23 +306,26 @@ describe("Multiple filters (OR)", { concurrent: true }, () => {
     },
   };
 
-  it("should return true if any filter is valid", () => {
+  it("should return true if any filter is valid", async () => {
     vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["en-gb"] }))
-      .true;
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, { groups: ["en-gb"] })
+    ).true;
 
     vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["en-us"] }))
-      .true;
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, { groups: ["en-us"] })
+    ).true;
   });
-  it("should return false if all filters are invalid", () => {
+  it("should return false if all filters are invalid", async () => {
     vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["en-us"] }))
-      .false;
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, { groups: ["en-us"] })
+    ).false;
   });
 });
 
-describe("Multiple filters (AND)", { concurrent: true }, () => {
+describe("Multiple filters (AND)", () => {
   const featureFlag: FeatureFlagWithFilters = {
     id: "feature",
     enabled: true,
@@ -311,6 +338,7 @@ describe("Multiple filters (AND)", { concurrent: true }, () => {
             Audience: {
               Groups: [{ Name: "en-gb", RolloutPercentage: 100 }],
               DefaultRolloutPercentage: 50,
+              Exclusion: { Groups: ["en-us"] },
             },
           },
         },
@@ -325,18 +353,24 @@ describe("Multiple filters (AND)", { concurrent: true }, () => {
     },
   };
 
-  it("should return true if all filters are valid", () => {
+  it("should return true if all filters are valid", async () => {
     vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["en-gb"] }))
-      .true;
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, {
+        groups: ["en-gb"],
+      })
+    ).true;
   });
-  it("should return false if any filter is invalid", () => {
+
+  it("should return false if any filter is invalid", async () => {
     vi.setSystemTime(new Date("Thu, 08 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["en-gb"] }))
-      .false;
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, { groups: ["en-gb"] })
+    ).false;
 
     vi.setSystemTime(new Date("Thu, 12 May 2024 22:59:59 GMT"));
-    expect(validateFeatureFlagWithFilters(featureFlag, { groups: ["en-us"] }))
-      .false;
+    expect(
+      await validateFeatureFlagWithFilters(featureFlag, { groups: ["en-us"] })
+    ).false;
   });
 });

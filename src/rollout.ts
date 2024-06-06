@@ -5,6 +5,5 @@
  * for different groups by percentage.
  */
 
-export { handleRolloutWithHash } from "./handlers/hash-rollout.js";
-export { handleRolloutWithIncrement } from "./handlers/increment-rollout.js";
+export { handleRolloutWithIncrement } from "./handlers/rollout-increment.js";
 export type { FeatureFlagHandleRollout } from "./types.js";
